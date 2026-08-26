@@ -1374,7 +1374,7 @@ function lessonView() {
             <p>${lesson.intro}</p>
             <div class="meta-row"><span>Stap ${step} van ${lesson.steps}</span><span>Quiz: ${lesson.quiz} correct</span></div>
           </header>
-          <div class="lesson-body">${lesson.id === "1-1" ? gedragContent(step) : (isQuizStep ? quizBlock() : contentBlock(step))}</div>
+          <div class="lesson-body">${lesson.id === "1-1" ? gedragContent(step) : lesson.id === "1-2" ? les12Content(step) : lesson.id === "1-3" ? les13Content(step) : lesson.id === "2-1" ? les21Content(step) : lesson.id === "2-2" ? les22Content(step) : lesson.id === "2-3" ? les23Content(step) : (isQuizStep ? quizBlock() : contentBlock(step))}</div>
           <footer class="lesson-footer">
             <button class="btn ghost" data-course="${course.id}">Afsluiten</button>
             <div>
@@ -1584,6 +1584,568 @@ function gedragContent(step) {
         : `<button class="btn gb-verify" data-gb-verify-mc ${gb.mc ? "" : "disabled"}>Controleer antwoord</button>`}
     </div>`;
   }
+  return "";
+}
+
+// ---- Generic lesson-content engine (used by lessons 1-2, 1-3, 2-1, 2-2, 2-3) ----
+function lsState() {
+  if (!state.ls) state.ls = { mc: "", mcResult: null, tf: "", tfResult: null, checks: {}, checkResult: null, cats: {}, catResult: null, scaleH: null, scaleV: null, quad: {} };
+  return state.ls;
+}
+
+function lsTextCard(title, paragraphs, img, caption) {
+  return `<div class="gb-card">
+    <div class="gb-flex ${img ? "" : "gb-noimg"}">
+      <div class="gb-text"><h3>${title}</h3>${paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
+      ${img ? `<div class="gb-img"><img src="${img}" alt="">${caption ? `<span class="gb-caption">${caption}</span>` : ""}</div>` : ""}
+    </div>
+  </div>`;
+}
+
+function lsReflect(title, paragraphs) {
+  return `<div class="gb-card gb-reflect"><div class="gb-flex gb-noimg"><div class="gb-text"><h3>${title}</h3>${paragraphs.map(p => `<p>${p}</p>`).join("")}</div></div></div>`;
+}
+
+function lsMC(question, options, correctIndex, sub) {
+  const ls = lsState();
+  const done = ls.mcResult !== null;
+  return `<div class="gb-card">
+    <h3>${question}</h3>
+    <p class="gb-sub">${sub || "Selecteer een antwoord"}</p>
+    <div class="gb-options">
+      ${options.map((o, i) => {
+        const sel = ls.mc === String(i);
+        const cls = done ? (i === correctIndex ? "goed" : (sel ? "fout" : "")) : (sel ? "gekozen" : "");
+        return `<button class="gb-opt ${cls}" data-ls-mc="${i}" ${done ? "disabled" : ""}><span class="gb-radio">${sel ? "●" : ""}</span> ${o}${done && i === correctIndex ? '<span class="gb-mark ok">✓</span>' : ""}${done && sel && i !== correctIndex ? '<span class="gb-mark nok">×</span>' : ""}</button>`;
+      }).join("")}
+    </div>
+    ${done ? `<div class="gb-result ${ls.mcResult ? "goed" : "fout"}">${ls.mcResult ? "Correct!" : "Niet correct."}</div>`
+      : `<button class="btn gb-verify" data-ls-verify-mc="${correctIndex}" ${ls.mc !== "" ? "" : "disabled"}>Controleer antwoord</button>`}
+  </div>`;
+}
+
+function lsTF(statement, correct) {
+  const ls = lsState();
+  const done = ls.tfResult !== null;
+  const correctLabel = correct ? "Juist" : "Onjuist";
+  return `<div class="gb-card">
+    <h3>${statement}</h3>
+    <p class="gb-sub">Selecteer een antwoord</p>
+    <div class="gb-options">
+      ${["Juist", "Onjuist"].map(o => {
+        const sel = ls.tf === o;
+        const cls = done ? (o === correctLabel ? "goed" : (sel ? "fout" : "")) : (sel ? "gekozen" : "");
+        return `<button class="gb-opt ${cls}" data-ls-tf="${o}" ${done ? "disabled" : ""}><span class="gb-radio">${sel ? "●" : ""}</span> ${o}</button>`;
+      }).join("")}
+    </div>
+    ${done ? `<div class="gb-result ${ls.tfResult ? "goed" : "fout"}">${ls.tfResult ? "Correct!" : `Niet correct — het juiste antwoord is ${correctLabel}.`}</div>`
+      : `<button class="btn gb-verify" data-ls-verify-tf="${correctLabel}" ${ls.tf ? "" : "disabled"}>Controleer antwoord</button>`}
+  </div>`;
+}
+
+function lsCategorize(question, items, cats) {
+  const ls = lsState();
+  const done = ls.catResult !== null;
+  const verifyAttr = items.map((it, i) => `${i}:${it.cat}`).join("|");
+  return `<div class="gb-card">
+    <h3>${question}</h3>
+    <p class="gb-sub">Wijs elk item toe aan de juiste categorie</p>
+    <div class="gb-match">
+      ${items.map((it, i) => {
+        const chosen = ls.cats[i];
+        const ok = done && chosen === it.cat;
+        const rowCls = done ? (ok ? "goed" : "fout") : "";
+        return `<div class="gb-matchrow ls-catrow ${rowCls}">
+          <span class="gb-mleft">${it.t}</span>
+          <span class="ls-catbtns">${cats.map(c => `<button class="gb-opt ls-catbtn ${chosen === c ? "gekozen" : ""}" data-ls-cat="${i}:${c}" ${done ? "disabled" : ""}>${c}</button>`).join("")}</span>
+        </div>`;
+      }).join("")}
+    </div>
+    ${done ? `<div class="gb-result ${ls.catResult ? "goed" : "fout"}">${ls.catResult ? "Alles correct!" : "Nog niet correct — probeer het opnieuw."}</div>`
+      : `<button class="btn gb-verify" data-ls-verify-cat="${verifyAttr}">Controleer antwoorden</button>`}
+  </div>`;
+}
+
+function lsCheck(question, options, correctIndices, sub) {
+  const ls = lsState();
+  const done = ls.checkResult !== null;
+  return `<div class="gb-card">
+    <h3>${question}</h3>
+    <p class="gb-sub">${sub || "Selecteer alle juiste antwoorden"}</p>
+    <div class="gb-options">
+      ${options.map((o, i) => {
+        const juist = correctIndices.includes(i);
+        const cls = done ? (juist ? "goed" : (ls.checks[i] ? "fout" : "")) : (ls.checks[i] ? "gekozen" : "");
+        return `<button class="gb-opt ${cls}" data-ls-check="${i}" ${done ? "disabled" : ""}><span class="gb-box">${ls.checks[i] ? "✓" : ""}</span> ${o}${done && juist ? '<span class="gb-mark ok">✓</span>' : ""}${done && !juist && ls.checks[i] ? '<span class="gb-mark nok">×</span>' : ""}</button>`;
+      }).join("")}
+    </div>
+    ${done ? `<div class="gb-result ${ls.checkResult ? "goed" : "fout"}">${ls.checkResult ? "Correct!" : "Niet correct."}</div>`
+      : `<button class="btn gb-verify" data-ls-verify-check="${correctIndices.join(",")}" data-ls-total="${options.length}">Controleer antwoord</button>`}
+  </div>`;
+}
+
+function lsPointInSpace(title, intro) {
+  const ls = lsState();
+  const hLabels = ["Sterk indirect", "Indirect", "Neutraal", "Direct", "Sterk direct"];
+  const vLabels = ["Sterk taakgericht", "Taakgericht", "Neutraal", "Mensgericht", "Sterk mensgericht"];
+  const hx = ls.scaleH != null ? 8 + ls.scaleH * 21 : null;
+  const vy = ls.scaleV != null ? 8 + ls.scaleV * 21 : null;
+  return `<div class="gb-card">
+    <h3>${title}</h3>
+    <p>${intro}</p>
+    <div class="ls-axiswrap">
+      <svg viewBox="0 0 100 100" class="ls-axissvg">
+        <line x1="2" y1="50" x2="98" y2="50" stroke="#b9c6dd" stroke-width="1"/>
+        <line x1="50" y1="2" x2="50" y2="98" stroke="#b9c6dd" stroke-width="1"/>
+        ${hx != null ? `<circle cx="${hx}" cy="50" r="2.4" fill="#dc2626"/>` : ""}
+        ${vy != null ? `<circle cx="50" cy="${vy}" r="2.4" fill="#dc2626"/>` : ""}
+        ${hx != null && vy != null ? `
+          <line x1="${hx}" y1="50" x2="${hx}" y2="${vy}" stroke="#16a34a" stroke-width="1" stroke-dasharray="2,2"/>
+          <line x1="50" y1="${vy}" x2="${hx}" y2="${vy}" stroke="#16a34a" stroke-width="1" stroke-dasharray="2,2"/>
+          <circle cx="${hx}" cy="${vy}" r="3" fill="#16a34a"/>` : ""}
+      </svg>
+      <span class="ls-axislabel ls-axis-top">Taakgericht</span>
+      <span class="ls-axislabel ls-axis-bottom">Mensgericht</span>
+      <span class="ls-axislabel ls-axis-left">Indirect</span>
+      <span class="ls-axislabel ls-axis-right">Direct</span>
+    </div>
+    <p class="gb-sub">Horizontale as (Indirect – Direct)</p>
+    <div class="gb-options ls-scalerow">${hLabels.map((l, i) => `<button class="gb-opt ${ls.scaleH === i ? "gekozen" : ""}" data-ls-scale="scaleH:${i}">${l}</button>`).join("")}</div>
+    <p class="gb-sub">Verticale as (Taakgericht – Mensgericht)</p>
+    <div class="gb-options ls-scalerow">${vLabels.map((l, i) => `<button class="gb-opt ${ls.scaleV === i ? "gekozen" : ""}" data-ls-scale="scaleV:${i}">${l}</button>`).join("")}</div>
+  </div>`;
+}
+
+const lsQuadTemperaments = [
+  { id: "c", label: "Consciëntieus", sub: "Taakgericht · Indirect", color: "#16609e", fact: 4,
+    text: "Het C-temperament in ons is indirect en taakgericht. Woorden die passen bij het C-temperament zijn precies, geduldig, feiten, details, analyseren, denker, observator, gesloten en houdt van privacy." },
+  { id: "d", label: "Dominant", sub: "Taakgericht · Direct", color: "#d0332c", fact: 1,
+    text: "Het D-temperament in ons is direct en taakgericht. Woorden die passen bij het D-temperament zijn direct, overtuigend, avontuur, gedreven, resultaat- en prestatiegericht, hoog tempo en leidingnemend." },
+  { id: "s", label: "Stabiel", sub: "Mensgericht · Indirect", color: "#75a839", fact: 3,
+    text: "Het S-temperament in ons is indirect en mensgericht. Woorden die passen bij het S-temperament zijn betrokken, vriendelijk, oprecht, luisteren, attent, teamspeler, routine, gesloten en houdt van harmonie." },
+  { id: "i", label: "Interactief", sub: "Mensgericht · Direct", color: "#fabc50", fact: 2,
+    text: "Het I-temperament in ons is direct en mensgericht. Woorden die passen bij het I-temperament zijn inspirerend, hartelijk, gezellig, enthousiast, gericht op contact, sociaal, charmant, prater, impulsief en verbaal sterk." },
+];
+
+const lsQuadTemperamentsWhy = [
+  { id: "c", label: "Consciëntieus", sub: "WAAROM", color: "#16609e",
+    text: "De C in ons zoekt informatie om dingen te kunnen bedenken en vraagt 'WAAROM gaan we dat doen?' De hoge C wil veel meer feiten dan de D voordat hij in actie kan komen. Hij gaat hiervoor eerst op zoek naar informatie en details. De C in ons wil graag afspraken vastleggen en visualiseren: 'Bevestig onze afspraak even per mail'." },
+  { id: "d", label: "Dominant", sub: "WAT", color: "#d0332c",
+    text: "De D in ons gaat op zoek naar richting om te kunnen beslissen en gaat vragen 'WAT gaan we doen?' Een hoge D kan beslissingen nemen zonder veel informatie. De D in ons wordt niet gestuurd door gevoel of emotie en neemt een beslissing op basis van een paar of weinig feiten en argumenten. De D in ons kan snel schakelen." },
+  { id: "s", label: "Stabiel", sub: "HOE", color: "#75a839",
+    text: "De S in ons zoekt instructie om taken uit te kunnen voeren en gaat vragen 'HOE gaan we dat doen?' Een hoge S wil precies weten HOE hij iets moet uitvoeren. Hij maakt graag de dingen af waar hij aan begonnen is en zal als dat nodig is liever na werktijd nog even de taak afmaken dan hem laten liggen tot de volgende dag." },
+  { id: "i", label: "Interactief", sub: "WIE", color: "#fabc50",
+    text: "De I in ons zoekt erkenning om te kunnen beïnvloeden en gaat vragen 'WIE gaat dat doen?' De hoge I kijkt met WIE hij iets gaat doen. WAAROM, HOE en WAT worden onderweg wel duidelijk. De I in ons is vaak bezorgd met WIE hij in een groep zit of gaat samenwerken." },
+];
+
+function lsQuadrantGeneric(temps, footerLinks) {
+  const ls = lsState();
+  const allOpen = temps.every(q => ls.quad[q.id]);
+  const idsCsv = temps.map(t => t.id).join(",");
+  return `<div class="gb-card">
+    <p class="gb-hint">KLIK OP DE PLUSJES VOOR MEER UITLEG</p>
+    <div class="ls-quadwrap">
+      <span class="ls-qedge ls-qedge-top">TAAKGERICHT</span>
+      <span class="ls-qedge ls-qedge-bottom">MENSGERICHT</span>
+      <span class="ls-qedge ls-qedge-left">INDIRECT</span>
+      <span class="ls-qedge ls-qedge-right">DIRECT</span>
+      <div class="ls-quadgrid">
+        ${temps.map(q => `
+          <div class="ls-qcell" style="background:${q.color}">
+            <span class="ls-qlabel">${q.label}<small>${q.sub}</small></span>
+            <button class="gb-plus ${ls.quad[q.id] ? "open" : ""}" data-ls-quad="${q.id}" aria-label="${q.label}">${ls.quad[q.id] ? "×" : "+"}</button>
+            ${ls.quad[q.id] ? `<div class="gb-pop ls-qpop"><p>${q.text}</p></div>` : ""}
+          </div>`).join("")}
+      </div>
+      <button class="btn gb-openall" data-ls-quadall="${idsCsv}">${allOpen ? "Sluit alles" : "Open alles"}</button>
+    </div>
+    <div class="ls-factrow">
+      ${footerLinks.map(f => `<button class="ls-factchip" data-fact-detail="${f.fact}"><span class="ls-factdot" style="background:${f.color}"></span> ${f.label} <small>${icon("arrow")}</small></button>`).join("")}
+    </div>
+  </div>`;
+}
+
+function lsQuadrant() {
+  return lsQuadrantGeneric(lsQuadTemperaments, lsQuadTemperaments.map(q => ({ label: q.label + "-Temperament", fact: q.fact, color: q.color })));
+}
+
+const lsGraphData = [
+  { id: "D", color: "#d0332c", ii: 58, i: 85 },
+  { id: "I", color: "#fabc50", ii: 60, i: 68 },
+  { id: "S", color: "#75a839", ii: 30, i: 36 },
+  { id: "C", color: "#16609e", ii: 14, i: 21 },
+];
+
+function lsCoreDesiredGraph() {
+  const ls = lsState();
+  return `<div class="gb-card">
+    <h3>Grafiek: kernpatroon en gewenst patroon</h3>
+    <p>In ons Persoonlijke Stijl (DISC) Profiel meten we het limbische en neocortexale gedrag; ook wel het onderbewuste en bewuste gedrag genoemd. Dit noemen we ook wel het kernpatroon en het gewenste patroon. Klik op een kolom voor de exacte waarden.</p>
+    <div class="ls-graphwrap">
+      <span class="ls-graphband"></span>
+      ${lsGraphData.map(d => `
+        <button class="ls-graphcol" data-ls-quad="${d.id}" aria-label="${d.id}">
+          <span class="ls-graphdot" style="bottom:${d.i}%"></span>
+          <span class="ls-graphbar" style="height:${d.ii}%;background:${d.color}"></span>
+          <span class="ls-graphletter">${d.id}</span>
+        </button>`).join("")}
+    </div>
+    <div class="ls-graphlegend">
+      <span>● Graph I — gewenst gedrag (stip)</span>
+      <span>▮ Graph II — kernpatroon (staaf)</span>
+    </div>
+    ${lsGraphData.filter(d => ls.quad[d.id]).map(d => `<div class="gb-pop ls-qpop"><p><strong>${d.id}</strong> — Graph II (kernpatroon): ${d.ii} · Graph I (gewenst gedrag): ${d.i} · Δ ${d.i - d.ii}</p></div>`).join("")}
+  </div>`;
+}
+
+function les12Content(step) {
+  if (step === 1) return lsTextCard("Van menselijk gedrag naar DISC", [
+    "In de vorige les is de geschiedenis en basis van menselijk gedrag besproken: gewoontes en behoeftes en waar uit ons brein dit gedrag vandaan komt. Ons gedrag kan angst- of doelgedreven zijn en wordt beïnvloed door de omstandigheden waarin we ons bevinden. In deze les staat de basis van DISC centraal en gaan we dieper in op de twee primaire gedragsstijlen en de vier fundamentele temperamenten.",
+  ]);
+  if (step === 2) return lsTextCard("Geschiedenis DISC: Dr. William Moulton Marston", [
+    "Eind jaren twintig ontwikkelde de Amerikaanse psycholoog Dr. William Moulton Marston het DISC-model. Na zijn onderzoek publiceerde hij zijn werk in het boek 'Emotions of Normal People'. Dit is de basis voor ons Q4 Profiles Persoonlijke Stijl (DISC) Profiel. Marston observeerde mensen en maakte onderscheid tussen actief en passief gedrag. Menselijk gedrag kan beide zijn, afhankelijk of wij onze omgeving ervaren als vijandig of goedgezind. Deze observatie leidde tot een beschrijving van vier fundamentele temperamenten: DISC.",
+    "Ieder mens vertoont gedrag dat beïnvloed is door de combinatie en intensiteiten van alle vier de temperamenten. Er is echter vaak één temperament dat overheerst onder ongunstige omstandigheden: ons primaire temperament. Deze wordt veelal gesteund door een secundair temperament. De manier waarop we naar een bepaalde situatie kijken en hoe we ons gedragen in verschillende situaties zegt iets over onze verschillende temperamenten.",
+  ]);
+  if (step === 3) return lsTextCard("Wat is DISC?", [
+    "DISC is een behoeftemodel dat onze limbische en neocortexale voorkeuren meet. DISC geeft dus niet aan wie je bent, maar wat je bewuste en onderbewuste voorkeuren zijn, je temperamenten.",
+    "De onbewuste voorkeuren vanuit het reptielenbrein blijven bij DISC buiten beschouwing.",
+    "Ons Persoonlijke Stijl (DISC) Profiel geeft ons inzicht in deze vier fundamentele temperamenten; de onderbewuste voorkeuren, patronen of behoeften die een grote rol spelen in ons dagelijks handelen. Ook laat het zien hoe we ons gedrag bewust kunnen inzetten en of dit afwijkt van onze onderbewuste voorkeuren. Met meer kennis van ons bewuste en onderbewuste handelen en onze gedragsvoorkeuren kunnen we onze sterkten gebruiken en valkuilen tijdig signaleren.",
+  ]);
+  if (step === 4) return lsTextCard("Hoe ontstaan de vier temperamenten?", [
+    "Maar waar komen deze vier temperamenten vandaan? Om dit te begrijpen kijken we eerst naar de twee primaire gedragsstijlen.",
+    "Deze twee gedragsstijlen worden afgebeeld als twee assen in een grafiek. Dit is de horizontale as, indirect versus direct gecombineerd met de verticale as, taakgericht versus mensgericht. Deze primaire gedragsstijlen worden hieronder verder uitgelegd.",
+  ]);
+  if (step === 5) return lsTextCard("De horizontale as: indirect en direct", [
+    "<strong>Indirect.</strong> Indirecte (introverte) mensen laden zich op door alleen te zijn. Ze zijn behoedzaam, rustig en willen liever geïntroduceerd worden bij anderen. Indirecte mensen zijn rustige types, luisteren graag, praten met een zachter stemgeluid, hebben een rustige en beheerste lichaamstaal en staan niet graag op de voorgrond. Hun houding is afwachtend of passief. Indirecte mensen hebben een bedachtzame benadering waarbij de energie naar binnen is gericht, op hun eigen gedachtes en gevoelens. Zij hebben behoefte aan privacy.",
+    "<strong>Direct.</strong> Directe (extraverte) mensen zoeken actief mensen op, maken contact met anderen door zichzelf te introduceren, staan graag op de voorgrond en zeggen wat ze te zeggen hebben. Zij nemen risico's en nemen vaak het initiatief. Directe mensen zijn open, energiek en spraakzaam, hebben vaak een luider stemgeluid, geven een stevige handdruk en hebben een expressieve en levendige lichaamstaal. Zij hebben een directe, actieve benadering waarbij de energie naar buiten is gericht, op andere mensen, activiteiten en dingen.",
+  ]);
+  if (step === 6) return lsReflect("Opdracht: de horizontale as", [
+    "Mensen kunnen zowel indirect als direct gedrag laten zien. Dit kan zelfs per situatie verschillen.",
+    "<strong>Opdracht:</strong> bedenk een situatie die je hebt meegemaakt. Waar op de horizontale as (Indirect – Direct) bevond jij je in die situatie? Welk gedrag vertoonde je en waarom?",
+  ]);
+  if (step === 7) return lsTextCard("De verticale as: taakgericht en mensgericht", [
+    "<strong>Taakgericht.</strong> Van de horizontale as gaan we verder naar de verticale as: taakgericht versus mensgericht. Mensen die meer taakgericht zijn handelen rationeel en vanuit het denken. Zij zijn meer controlerend en richten zich op dingen doen en resultaten behalen. Zij nemen hun besluiten vaker op basis van feiten en argumenten en zijn gericht op het afronden van taken. Bij onenigheid zullen zij (indirect) de strijd aangaan om hun gelijk te krijgen, zij ervaren de omgeving dan ook als vijandig en stressvol. Woorden die bij taakgericht horen zijn: logisch, analytisch, denken, formeel, afstandelijk, objectief, concurrerend en correct.",
+    "<strong>Mensgericht.</strong> Mensen die meer mensgericht zijn, handelen vooral vanuit het voelen. Zij zijn gericht op het bouwen van relaties en nemen besluiten op basis van emoties en gevoel. Bij onenigheid zullen zij de situatie eerst laten rusten of proberen de harmonie te bewaren; ze reageren met een (indirecte) vluchtreactie. Zij ervaren de omgeving als goedgezind en vriendelijk. Woorden die bij mensgericht horen zijn: persoonlijk, voelen, informeel, betrokken, meelevend en tegemoetkomend.",
+    "Ook nu gaat het om de verhouding tussen taakgericht enerzijds en mensgericht anderzijds. We hebben beide in ons, maar wat in welke verhouding? Wat laten we meer of juist minder zien en met welke intensiteit?",
+  ]);
+  if (step === 8) return lsReflect("Opdracht: de verticale as", [
+    "Mensen kunnen ook zowel taakgericht als mensgericht gedrag laten zien. Dit kan zelfs per situatie verschillen.",
+    "<strong>Opdracht:</strong> bedenk dezelfde situatie als bij de vorige opdracht. Waar op de verticale as (Taakgericht – Mensgericht) bevond jij je in die situatie? Welk gedrag vertoonde je en waarom?",
+  ]);
+  if (step === 9) return lsPointInSpace("Een punt in de ruimte",
+    "In onderstaand assenstelsel is met een 'X' het voorkeursgedrag aangegeven, de hoogste frequentie. We meten op twee assen. De kruisjes die daar gezet zijn, worden met elkaar verbonden en zorgen zo voor een punt in de ruimte. Dit is iemands vertrekpunt, maar we hebben ook het tegenovergestelde gedrag nodig om goed te kunnen functioneren. Iemand die dus heel direct en taakgericht is kan ook indirect en mensgericht gedrag laten zien. Dit zal wel minder vaak voorkomen en er zal dan heel bewust voor gekozen moeten worden.");
+  if (step === 10) return lsTextCard("De vier fundamentele temperamenten", [
+    "Als we beide assen omkaderen krijg je een vierkwadrantengrid met daarin de vier primaire temperamenten van ons DISC-model: Dominant, Interactief, Stabiel en Consciëntieus.",
+    "We hebben alle vier de temperamenten in ons, alleen kunnen ze niet allemaal even sterk aanwezig zijn. Afhankelijk van DNA, opvoeding, gewoontes en belangrijke ervaringen zal het ene temperament overheersender zijn dan het andere. Als we zeggen: 'iemand heeft een hoge C', dan betekent dit dat hij meer dan gemiddeld het gedrag laat zien dat hoort bij het C-temperament. Hoe hoger de intensiteit, hoe vaker en hoe sterker dat gedrag (aanwezig) zal zijn. Dit zegt niets over hoe goed iemand ergens in is, maar op welke manier iemand werkt en reageert.",
+  ]);
+  if (step === 11) return lsQuadrant();
+  if (step === 12) return lsMC("Wat meet DISC?", ["Interesses", "Behoeften", "Waarden", "Vaardigheden"], 1);
+  if (step === 13) return lsTF("Mensen laten maar één soort gedrag zien: indirect of direct.", false);
+  if (step === 14) return lsMC("De tuin moet worden opgeknapt en je wordt geholpen door twee goede vrienden. In je uitnodiging geef je aan dat je het fijn vindt om het samen te doen, rustig aan te pakken en elkaar te helpen. Het hoeft niet allemaal in één keer af, maar je wilt er wel samen stap voor stap aan werken. Waar in de grafiek bevind jij je?",
+    ["Direct en mensgericht", "Indirect en taakgericht", "Indirect en mensgericht", "Direct en taakgericht"], 2);
+  if (step === 15) return lsCategorize("Wijs elk item toe aan de juiste categorie", [
+    { t: "Besluit door emoties en gevoel", cat: "Mensgericht" },
+    { t: "Gaat confrontatie aan", cat: "Taakgericht" },
+    { t: "Bouwen van relaties", cat: "Mensgericht" },
+    { t: "Emotioneel", cat: "Mensgericht" },
+    { t: "Gaat confrontatie uit de weg", cat: "Mensgericht" },
+    { t: "Besluit door feiten en argumenten", cat: "Taakgericht" },
+    { t: "Controlerend", cat: "Taakgericht" },
+    { t: "Relaterend", cat: "Mensgericht" },
+    { t: "Rationeel", cat: "Taakgericht" },
+  ], ["Taakgericht", "Mensgericht"]);
+  if (step === 16) return lsMC("Welk kernwoord past het beste bij een C-temperament?", ["Aardig", "Georganiseerd", "Resultaatgericht", "Enthousiast"], 1);
+  if (step === 17) return lsMC("Waar zou u zich op richten om een D-temperament op een succesvolle manier te beïnvloeden?",
+    ["Erkenning en blijk van waardering", "Persoonlijk contact en geruststelling", "Gedocumenteerde onderbouwingen en logica", "Beste opties en doelen"], 3);
+  return "";
+}
+
+function les13Content(step) {
+  if (step === 1) return lsTextCard("De basis van DISC", [
+    "We legden in de vorige lessen de basis uit van het DISC-model uit: een model dat behoeften meet en de vier fundamentele temperamenten beschrijft. In deze les gaan we hier verder op in. We maken een begin met het lezen van grafieken en leren het verschil tussen het kernpatroon en gewenst patroon.",
+  ]);
+  if (step === 2) return lsQuadrant();
+  if (step === 3) return lsTextCard("Gunstige en ongunstige omstandigheden", [
+    "De omstandigheden waarin we ons kunnen bevinden kunnen voor ons gunstig of ongunstig zijn. Ongunstige omstandigheden zijn omstandigheden waarin we ons niet prettig voelen of waarin we ons onveilig voelen. Ons systeem staat op scherp en we kunnen ons minder goed aanpassen. We vallen terug op onze gewoontes en handelen en reageren sterker vanuit onze behoeften. Je handelt dan meer vanuit het kernpatroon.",
+    "Gunstige omstandigheden zorgen ervoor dat we ons op ons gemak voelen en veilig genoeg voelen zodat we ons kunnen aanpassen aan onze omgeving. We passen onze communicatie en gedrag aan de situatie aan. We handelen naar wat we denken dat er van ons verwacht wordt. Je kunt dan meer gewenst gedrag laten zien en je eigen routines minder op de voorgrond zetten.",
+  ]);
+  if (step === 4) return lsCoreDesiredGraph();
+  if (step === 5) return lsTextCard("Kernpatroon en gewenst patroon", [
+    "<strong>Kernpatroon.</strong> Het kernpatroon (grafiek II, staven) is je natuurlijke gedrag. Dit beschrijft onze meest natuurlijke gedragsvoorkeuren. De opbouw en teksten van het Persoonlijke Stijl (DISC) Profiel zijn gebaseerd op dit kernpatroon. In een stressvolle situatie stuurt het onderbewuste onze handelingen aan. We kiezen hier niet voor, we zijn ons er vaak ook niet van bewust. Toch is dit het meest voorspelbare deel van ons gedrag in ongunstige omstandigheden.",
+    "<strong>Gewenst patroon.</strong> Het gewenste patroon (grafiek I, lijndiagram, stippen) is het gedrag dat je bewust kiest onder gunstige omstandigheden. Dit is ook het gedrag dat mensen om je heen als eerste zien. Als de omstandigheden gunstig zijn en we ons op ons gemak voelen, passen we ons gedrag aan naar wat we denken dat er van ons verwacht wordt of wat we nuttig of prettig vinden.",
+  ]);
+  if (step === 6) return lsReflect("Opdracht: een ongunstige situatie", [
+    "Herken je het bovenstaande? Denk aan een situatie die voor jou ongunstig is, bijvoorbeeld: stress op het werk, zenuwachtig zijn voor een presentatie, kritiek krijgen.",
+    "<strong>Opdracht:</strong> hoe reageer je uit gewoonte in deze situatie en hoe zou je willen reageren?",
+  ]);
+  if (step === 7) return lsTextCard("Wat vertelt de grafiek ons?", [
+    "Wat vertelt de grafiek ons verder over ons kernpatroon en bewust gedrag? De grafiek laat de intensiteit van een stijl zien, die loopt van 0 tot 100. De middenlijn is 50. Dit kan per persoon verschillen. Hoe hoger de uitkomst, hoe frequenter en hoe intenser dat gedrag zal zijn. Hoe lager de uitkomst, hoe minder vaak dat gedrag getoond wordt. Dit betekent niet dat iemand dit gedrag niet heeft, maar dat hij of zij het minder vaak of minder intens laat zien.",
+    "Daarnaast vertoont iedereen gedrag vanuit alle vier de temperamenten: het gaat om de combinatie van alle vier de gedragstemperamenten, de volgorde en de intensiteit. Een hoge uitkomst voor een temperament zegt net zoveel over iemands gedrag als een lage uitkomst.",
+  ]);
+  if (step === 8) return lsTextCard("Volgorde van temperamenten", [
+    "We hebben alle vier de temperamenten in ons, maar de vraag is: wat is onze persoonlijke volgorde? We willen antwoord op alle vier de vragen om tot actie over te gaan, maar de volgorde is voor iedereen anders. Een ISDC bijvoorbeeld wil eerst weten MET WIE hij gaat samenwerken, dan HOE, dan pas WAT er precies gedaan moet worden en tot slot wil hij weten WAAROM.",
+  ]);
+  if (step === 9) return lsQuadrantGeneric(lsQuadTemperamentsWhy, [{ label: "De waarde in een team", fact: 5, color: "#475569" }]);
+  if (step === 10) return lsCheck("Welke van onderstaande antwoordopties zegt iets over de verschillende temperamenten?", [
+    "Interesses in bepaalde onderwerpen",
+    "De manier waarop we naar een situatie kijken",
+    "De manier waarop we vaardigheden inzetten in verschillende situaties",
+    "Ons acceptatieniveau in verschillende situaties",
+    "Hoe we ons gedragen in verschillende situaties",
+  ], [1, 4]);
+  if (step === 11) return lsTF("Door meer inzicht te krijgen in je kernpatroon leer je je valkuilen te vermijden en steeds meer gewenst gedrag in te zetten.", true);
+  if (step === 12) return lsCategorize("Wijs elk item toe aan de juiste categorie", [
+    { t: "Gewoontes", cat: "Kernpatroon" },
+    { t: "Bewust gedrag", cat: "Gewenst patroon" },
+    { t: "Ongunstige omstandigheden", cat: "Kernpatroon" },
+    { t: "Gunstige omstandigheden", cat: "Gewenst patroon" },
+    { t: "Neocortex", cat: "Gewenst patroon" },
+    { t: "Natuurlijk gedrag", cat: "Kernpatroon" },
+    { t: "Limbisch systeem", cat: "Kernpatroon" },
+    { t: "Onderbewust gedrag", cat: "Kernpatroon" },
+  ], ["Kernpatroon", "Gewenst patroon"]);
+  if (step === 13) return lsTF("De volgorde van CISD is Waarom-Wie-Hoe-Wat.", true);
+  return "";
+}
+
+const lsQuadTemperamentsEsteem = [
+  { id: "c", label: "Consciëntieus", sub: "Hoge vs. lage eigenwaarde", color: "#3097d1",
+    text: "Een hoge C-stijl is in zijn element en doelgedreven, wanneer hij goed over dingen kan nadenken en zich kan voorbereiden. Alle ins en outs op een rijtje heeft alvorens te handelen. Maar een omgeving waar dit niet mogelijk is geeft frictie, zeker als hij op fouten wordt aangesproken. Dit beschouwt de C-stijl als heel oneerlijk en ervaart dat als een persoonlijke aanval. In zo'n angstgedreven omgeving kan deze stijl heel verbaal worden, zelfs emotioneel." },
+  { id: "d", label: "Dominant", sub: "Hoge vs. lage eigenwaarde", color: "#cc0911",
+    text: "Een D-stijl met hoge eigenwaarde, die helemaal 'in control' is, zal kracht halen uit zijn doelgedrevenheid. Maar iemand met een D-temperament die zich niet op zijn gemak voelt en een lage eigenwaarde heeft, ervaart de angst dat iemand misbruik van hem maakt en dat hij niet de controle heeft. In deze angstgedrevenheid kan hij bijvoorbeeld niet willen luisteren of zich autoritair opstellen en zelfs ongenuanceerd worden." },
+  { id: "s", label: "Stabiel", sub: "Hoge vs. lage eigenwaarde", color: "#6ba924",
+    text: "Een S-temperament met een hoge eigenwaarde zal heel gedreven zijn, letterlijk op het doel: het uitvoeren en voltooien hiervan. Als hij weet hoe hij iets moet uitvoeren, waarom het moet en dat het belangrijk is, dan gaat hij ervoor. Maar komt er plotseling een onverwachte verandering, dan kan het omslaan — zeker wanneer de instructie (nog) niet duidelijk is. De angstgedreven reactie kan dan zijn: hakken in het zand, stug worden en zelfs eigenwijs." },
+  { id: "i", label: "Interactief", sub: "Hoge vs. lage eigenwaarde", color: "#f6be07",
+    text: "Wanneer een hoog I-temperament doelgedreven is, zal zijn instelling zeer positief zijn: enthousiast en met veel vertrouwen in alles en iedereen. Zeer inspirerend ook, waardoor hij anderen gemakkelijk meekrijgt. Maar in een omgeving met veel conflictsituaties, of waar hij niet erkend wordt, zal een I-type vanuit zijn angstgedrevenheid handelen. Hij kan dan stil worden, zich terugtrekken of zelfs letterlijk vluchten." },
+];
+
+function les21Content(step) {
+  if (step === 1) return lsTextCard("Vier fundamentele temperamenten", [
+    "In de vorige box heb je meer geleerd over de basis van DISC en het menselijk gedrag. In deze box borduren we daarop voort; we maken de stap naar het vertalen van DISC naar het Persoonlijke Stijl (DISC) Profiel. Het uiteindelijke doel is om dit profiel als Certified Partner uit te kunnen leggen in bijvoorbeeld een coachgesprek of training. Daarom oefenen we in deze les verder met de vier fundamentele temperamenten, zodat je straks met zelfvertrouwen met de methodiek en het profiel aan de slag kunt.",
+  ]);
+  if (step === 2) return lsTextCard("Effect van zelfkennis, zelfwaardering en zelfvertrouwen", [
+    "Zoals eerder gezegd: zelfkennis gaat over hoe goed we onszelf kennen, zelfwaardering (eigenwaarde) gaat over hoe we over onszelf denken en zelfvertrouwen gaat over de uitvoering, over onze acties, hoe we handelen. Hoe gedragen we ons als we ons op ons gemak voelen? Wanneer we op bekend terrein de dingen doen die we kunnen.",
+    "Maar ook: hoe gedragen we ons op een slechte dag, als we ons minder op ons gemak voelen? Of wanneer we ons door een ongemakkelijke, onbekende situatie onzeker voelen en ons gevoel van eigenwaarde onder druk komt te staan.",
+  ]);
+  if (step === 3) return lsTextCard("Voorbeeld: de voetballer", [
+    "Het effect van zelfkennis, zelfwaardering en zelfvertrouwen is te zien bij bijvoorbeeld een voetballer die speelt op een vaste positie, daar goed in is en zich helemaal thuis voelt op die positie.",
+    "Door blessures moet dezelfde speler ineens op een compleet andere positie spelen: alles is nieuw, geen ervaring, en hij voelt zich niet op zijn plek.",
+  ]);
+  if (step === 4) return lsReflect("Reflectie: op je gemak voelen", [
+    "Is dit voor jou herkenbaar? Wanneer voel jij je op je gemak?",
+  ]);
+  if (step === 5) return lsTextCard("Willen of moeten? Doel of angst?", [
+    "Mensen met een hoge mate van zelfvertrouwen zeggen vaker \"ik WIL\", mensen met een lager zelfvertrouwen zeggen vaker \"ik MOET\".",
+    "Vanuit het WILLEN zijn we veel beter in staat ons timemanagement te controleren dan vanuit het MOETEN.",
+    "En hoe worden we gedreven? Zijn we meer positief gedreven vanuit een hoge eigenwaarde of zijn we meer negatief gedreven vanuit een lage eigenwaarde en onzekerheid?",
+  ]);
+  if (step === 6) return lsQuadrantGeneric(lsQuadTemperamentsEsteem, []);
+  if (step === 7) return lsTextCard("Vecht vs. vlucht: basisreactie per stijl", [
+    "<strong>D-stijl.</strong> De D-stijl gaat de confrontatie aan en direct op het doel af. De D-stijl wil controle hebben en behouden en zal deze bij elke situatie dan ook direct (terug)pakken. We noemen dit: direct vechtgedrag.",
+    "<strong>I-stijl.</strong> De grootste angst van de I-stijl is sociale afwijzing en gaat daarom liever geen confrontaties aan. Maakt een geintje, houdt zijn mond of loopt er (letterlijk) van weg. Ook wel direct vluchtgedrag genoemd.",
+    "<strong>S-stijl.</strong> Een S-stijl wil graag de harmonie bewaren. Zal altijd proberen te voorkomen dat er spanning ontstaat — dit is indirect vluchtgedrag.",
+    "<strong>C-stijl.</strong> Een C-stijl gaat niet direct de confrontatie aan, maar wil eerst zeker zijn van zijn zaak. Er eerst goed over nadenken en bedenken om er dan later op terug te komen. We noemen dit indirect vechtgedrag.",
+  ]);
+  if (step === 8) return lsTextCard("Oriëntatie op verandering", [
+    "Het is interessant om te kijken naar het effect van verandering op de verschillende temperamenten.",
+    "De D in ons houdt van verandering; verandering betekent uitdaging, nieuwe doelen en betere resultaten. De I in ons merkt verandering niet of nauwelijks op; schakelt gemakkelijk en is gericht op de grote lijnen. De S in ons heeft voorbereiding nodig bij veranderingen — het kost de S vaak energie, omdat deze gericht is op het behouden van de status quo. De C in ons maakt zich zorgen over de effecten van de verandering en heeft voldoende informatie en onderbouwing nodig.",
+  ]);
+  if (step === 9) return lsTextCard("Frustratiereactie", [
+    "En wat is de reactie op frustratie op de verschillende temperamenten?",
+    "De D in ons ziet zijn eigen fouten niet en geeft anderen de schuld. Iemand met een hoge D zal niet snel toegeven of zichzelf ergens de schuld van geven. De I in ons raakt verward of wordt doelloos wanneer frustratie aan de orde is; hij kan gaan ratelen en over-emotioneel worden. De S in ons wordt bezorgd of zwaarmoedig wanneer hij gefrustreerd is — dit wordt niet snel geuit. De C in ons trekt zich terug als reactie op frustratie en gaat overpeinzen.",
+  ]);
+  if (step === 10) return lsTextCard("Complementaire stijlen", [
+    "Stijlen die tegenover elkaar liggen in de grid vullen elkaar aan in gunstige omstandigheden. Maar zodra er een spanningsveld ontstaat worden de complementaire stijlen juist elkaars tegenpolen.",
+    "Bijvoorbeeld: C en I zijn complementaire stijlen. In gunstige omstandigheden zorgt I voor de mensgerichte kant, waar C meer details en informatie zoekt. In een ongunstige situatie kan het leiden tot een innerlijk conflict.",
+    "<em>Yin en Yang versus Yin of Yang</em>",
+  ]);
+  if (step === 11) return lsMC("Welke van onderstaande stellingen is juist?", [
+    "Een S-temperament: op zijn best gepassioneerd en betrokken, op zijn slechtst ongenuanceerd en impulsief.",
+    "Een C-temperament: op zijn best beschouwend en berekenend, op zijn slechtst klagerig en ongevoelig.",
+    "Een I-temperament: op zijn best servicegericht en praktisch, op zijn slechtst stug en koppig.",
+    "Een D-temperament met een hoge zelfwaardering zal besluitvaardig en aansturend gedrag laten zien. Maar een D-temperament die een lage zelfwaardering heeft zal opstandig worden en veeleisend.",
+  ], 3);
+  if (step === 12) return lsMC("Welke stijl hoort bij de DOELgedrevenheid Stabiliteit en Waardering?", ["S-stijl", "I-stijl", "C-stijl", "D-stijl"], 0);
+  if (step === 13) return lsMC("Welke stijl kan je het beste op de volgende manier benaderen: 'Ik heb 10 minuten van je nodig. Wat mij betreft kan dat nu, of straks om 16:00 uur'?",
+    ["I-stijl", "S-stijl", "D-stijl", "C-stijl"], 2);
+  if (step === 14) return lsCategorize("Welk temperament hoort bij de basisreacties vechten of vluchten?", [
+    { t: "Directe vechtreactie", cat: "D-temperament" },
+    { t: "Indirecte vechtreactie", cat: "C-temperament" },
+    { t: "Directe vluchtreactie", cat: "I-temperament" },
+    { t: "Indirecte vluchtreactie", cat: "S-temperament" },
+  ], ["D-temperament", "I-temperament", "S-temperament", "C-temperament"]);
+  if (step === 15) return lsCategorize("Hoe reageren de verschillende gedragsstijlen op frustratie?", [
+    { t: "Hoog D", cat: "Geeft anderen de schuld" },
+    { t: "Hoog I", cat: "Ongeorganiseerd/verward" },
+    { t: "Hoog S", cat: "Trekt zich terug" },
+    { t: "Hoog C", cat: "Overpeinst" },
+  ], ["Geeft anderen de schuld", "Ongeorganiseerd/verward", "Trekt zich terug", "Overpeinst"]);
+  if (step === 16) return lsTF("Bij de complementaire stijlen D en S neemt in gunstige omstandigheden D de beslissingen, bepaalt de koers en de S voert dit dan uit.", true);
+  return "";
+}
+
+function lsGraphLegend() {
+  const items = [
+    ["Lijndiagram (I)", "Gewenst patroon, gewenst gedrag. Zijn de omstandigheden gunstig, dan laat je gewenst gedrag zien, daar kies je bewust voor."],
+    ["Staafdiagram (II)", "Kernpatroon, natuurlijk gedrag. Zijn de omstandigheden minder gunstig, dan laat je natuurlijk gedrag zien. Daar kies je niet bewust voor, daar ben je je niet helemaal van bewust."],
+    ["Delta (Δ)", "Het verschil tussen grafiek I en grafiek II."],
+    ["1-100%", "De resultaten van de respondent vergeleken met die van anderen."],
+    ["50%", "De middellijn/het gemiddelde. Hierin val je wel of juist niet op in vergelijking met je omgeving."],
+    ["> 90%", "Als het percentage 90 of meer is, dan is dit temperament zeer hoog in vergelijking met anderen."],
+    ["< 10%", "Als het percentage minder dan 10 is, dan is dit temperament juist zeer laag in vergelijking met anderen."],
+  ];
+  return `<div class="gb-card"><div class="ls-legendgrid">${items.map(([k, v]) => `<div class="ls-legenditem"><strong>${k}</strong><span>${v}</span></div>`).join("")}</div></div>`;
+}
+
+function lsGraphFull() {
+  return lsCoreDesiredGraph() + lsGraphLegend();
+}
+
+function les22Content(step) {
+  if (step === 1) return lsTextCard("Van DISC naar het Persoonlijke Stijl (DISC) Profiel", [
+    "Het kennen van de vier fundamentele temperamenten is natuurlijk van groot belang tijdens je werkzaamheden als Certified Partner. Je kent de eigenschappen van de temperamenten, maar uiteindelijk is het de bedoeling dat je het hoe en waarom hierachter kunt benoemen. Wat zit er achter de stijl, waarom reageert iemand op een bepaalde manier? In deze les maken we de vertaalslag van DISC naar het Persoonlijk Stijl (DISC) Profiel.",
+  ]);
+  if (step === 2) return lsTextCard("Kernpatroon en gewenst patroon", [
+    "In de vorige cursus hadden we het over het kernpatroon en gewenst patroon en hoe dit wordt weergegeven in een grafiek.",
+    "Het kernpatroon (grafiek II, staafdiagram, balken) is dus je natuurlijke gedrag. Dit beschrijft onze meest natuurlijke gedragsvoorkeuren. De opbouw en teksten van het Persoonlijke Stijl (DISC) Profiel zijn gebaseerd op dit kernpatroon.",
+    "Het gewenst patroon (grafiek I, lijndiagram, bolletjes) is het gedrag dat je juist bewust kiest in gunstige omstandigheden.",
+  ]);
+  if (step === 3) return lsTextCard("16 basisstijlen", [
+    "In het Persoonlijke Stijl (DISC) Profiel wordt dus gekeken naar je primaire en secundaire stijl. We hebben op basis hiervan 16 basisstijlen beschreven. Uit het profiel dat jij en de respondent ontvangen komt dus altijd 1 van de 16 basisstijlen naar voren. Deze 16 basispatronen vormen slechts de context van waaruit we een gesprek kunnen voeren over gedrag.",
+  ]) + `<div class="ls-factrow"><button class="ls-factchip" data-fact-detail="7"><span class="ls-factdot" style="background:#475569"></span> De 16 temperamentbeschrijvingen <small>${icon("arrow")}</small></button></div>`;
+  if (step === 4) return lsReflect("Reflectie: waar sta jij in de grid?", [
+    "Waar sta jij in de grid? Herken je jezelf hierin?",
+  ]);
+  if (step === 5) return lsTextCard("De grafiek en de legenda", [
+    "Het kernpatroon en het gewenst patroon maken in de grafiek natuurlijk nog meer zichtbaar. Het is daarom goed om nog eens verder te kijken naar de grafiek en de legenda.",
+    "De hoogte van de grafieken zegt iets over de intensiteit van een temperament. Is dit zeer hoog, dan zal het gedrag vaker voorkomen en intenser zijn.",
+    "In de grafiek staan ook cijfers. De linkerzijde gaat van 0 tot 100%, met 50% als middellijn. Dit zegt iets over de uitkomst van de respondent vergeleken met die van anderen. Als het percentage 90% of meer is, dan is het zeer hoog in vergelijking met anderen. Andersom geldt dit voor een percentage lager dan 10%.",
+  ]);
+  if (step === 6) return lsGraphFull();
+  if (step === 7) return lsTextCard("Wanneer spreken we van balans?", [
+    "Uiteraard kan het bewust gekozen gedrag ook overeenkomen met iemands natuurlijke voorkeuren. Dan kunnen we zeggen dat iemand goed in balans is en waarschijnlijk geen energieverlies ervaart.",
+    "Wel is het zo dat als de omstandigheden ongunstiger worden, de sterke kanten van dit temperament zouden kunnen doorslaan, extremer worden, en zo omslaan naar valkuilen.",
+    "Bijvoorbeeld: een onderhoudende I die verbaal sterk is en anderen kan overtuigen en inspireren, kan onder druk doorslaan. Teveel woorden gebruiken, doorratelen en kan daarbij anderen verliezen, niet meer bereiken.",
+  ]);
+  if (step === 8) return lsTextCard("Energie (Delta > 20%)", [
+    "Bij het lezen van deze grafiek is het erg belangrijk te kijken naar het verschil (Delta ∆) tussen de staafdiagram (II) en de lijndiagram (I). Is de delta groter dan 20% dan is er sprake van veranderend gedrag of energieverlies.",
+    "Bij ∆ is +20% dan onderdruk je je energie, je wil het kwijt maar kunt het niet en dat is vermoeiend. Bij ∆ is -20% dan wordt er meer energie gevraagd dan je van nature in huis hebt; ook dat is vermoeiend.",
+    "Door de delta te bekijken tussen grafiek I en grafiek II kunnen we een aantal dingen zeggen. Bijvoorbeeld over de verandering van het gedrag en/of waar je energie op verliest en wat je zou kunnen doen om je accu weer op te laden.",
+  ]);
+  if (step === 9) return lsTextCard("Tip: de delta als coachingsstartpunt", [
+    "\"Dit verschil, de delta (∆), geeft weer waar iemand mogelijk energieverlies leidt en is een goed uitgangspunt voor een (coachings-)gesprek.\"",
+  ]) + `<div class="ls-factrow"><button class="ls-factchip" data-fact-detail="9"><span class="ls-factdot" style="background:#475569"></span> Energie <small>${icon("arrow")}</small></button></div>`;
+  if (step === 10) return lsCategorize("Wat is de DISC-stijl van de onderstaande rolbeschrijvingen?", [
+    { t: "Strateeg (Controlerend)", cat: "Cd" },
+    { t: "Doener (Produceren)", cat: "Sd" },
+    { t: "Bemiddelaar (Tolerant)", cat: "Is" },
+  ], ["Cd", "Sd", "Is"]);
+  if (step === 11) return lsTF("Bij een ∆-20 of meer laad je op met activiteiten van de complementaire stijl.", false);
+  if (step === 12) return lsTF("Bij een ∆+20 of meer is het zaak op te laden met activiteiten of kenmerken van de eigen stijl.", true);
+  if (step === 13) return lsCategorize("Hoe kunnen de verschillende gedragsstijlen hun batterij weer opladen?", [
+    { t: "Hoog D", cat: "Fysieke activiteit" },
+    { t: "Hoog I", cat: "(Veel) praten / sociale interactie" },
+    { t: "Hoog S", cat: "Even niets moeten" },
+    { t: "Hoog C", cat: "Denktijd" },
+  ], ["Fysieke activiteit", "(Veel) praten / sociale interactie", "Even niets moeten", "Denktijd"]);
+  if (step === 14) return lsMC("In deze grafiek is energieverlies zichtbaar van +27,5 bij het D-temperament. Er wordt van deze persoon dus in de werksituatie minder D-energie gevraagd. Wat kan hier aan de hand zijn?", [
+    "Deze persoon heeft weinig beslissingsbevoegdheid.",
+    "Deze persoon is een manager, moet direct aansturen.",
+    "Het werk gaat deze persoon gemakkelijk af.",
+  ], 0);
+  if (step === 15) return lsMC("Hoe kan deze persoon weer opladen na dit energieverlies?", [
+    "Even niets moeten, tijd voor zichzelf",
+    "Gezelligheid opzoeken, van je af praten",
+    "Een competitieve, fysieke uitdaging aangaan",
+  ], 2);
+  return "";
+}
+
+function lsPatternGraph(id, data) {
+  const ls = lsState();
+  const colors = { D: "#d0332c", I: "#fabc50", S: "#75a839", C: "#16609e" };
+  const letters = Object.keys(data);
+  return `<div class="ls-graphwrap">
+    <span class="ls-graphband"></span>
+    ${letters.map(l => {
+      const key = id + l;
+      const d = data[l];
+      return `<button class="ls-graphcol" data-ls-quad="${key}" aria-label="${l}">
+        <span class="ls-graphdot" style="bottom:${d.i}%"></span>
+        <span class="ls-graphbar" style="height:${d.ii}%;background:${colors[l]}"></span>
+        <span class="ls-graphletter">${l}</span>
+      </button>`;
+    }).join("")}
+  </div>
+  <div class="ls-graphlegend"><span>● Graph I — gewenst gedrag</span><span>▮ Graph II — kernpatroon</span></div>
+  ${letters.filter(l => ls.quad[id + l]).map(l => { const d = data[l]; return `<div class="gb-pop ls-qpop"><p><strong>${l}</strong> — Graph II (kernpatroon): ${d.ii} · Graph I (gewenst gedrag): ${d.i} · Δ ${(d.i - d.ii).toFixed(1)}</p></div>`; }).join("")}`;
+}
+
+function les23Content(step) {
+  if (step === 1) return lsTextCard("Opbouw van het Persoonlijke Stijl (DISC) Profiel", [
+    "Na het oefenen met de vier fundamentele temperamenten, de grafieken en de basiskennis over gedrag gaan we verder met de opbouw van het Persoonlijke Stijl (DISC) Profiel. Het uiteindelijke doel is het lezen, begrijpen en interpreteren van dit profiel in een training of (coachings)gesprek.",
+  ]);
+  if (step === 2) return lsTextCard("De meting", [
+    "Wat meten we nu precies? Op basis van de gegeven antwoorden maken we een patroonanalyse. Dit patroon is verdeeld in twee belangrijke assen. De horizontale as geeft aan of iemand meer direct of indirect gedrag vertoont. Op de verticale as wordt het besluitvormingsproces weergegeven: neemt iemand meer beslissingen op basis van taken of meer op basis van emoties? Hieruit volgt of iemand meer taakgericht of meer mensgericht handelt. De interpretatie en berekening achter de antwoorden zijn bepalend voor de uiteindelijke uitkomst in de grafiek.",
+  ]) + `<div class="ls-factrow"><button class="ls-factchip" data-fact-detail="8"><span class="ls-factdot" style="background:#475569"></span> De Meting <small>${icon("arrow")}</small></button></div>`;
+  if (step === 3) return lsTextCard("Zelfbeeld", [
+    "Wat we nog apart meten met een extra set van ca. 20 vragen is het zelfbeeld. Het is niet (zoals wel eens wordt gedacht) een andere weergave van grafiek I of een gemiddelde van grafiek I en II; het is een extra meting die kenmerkend is voor het Persoonlijke Stijl (DISC) Profiel en de aanpak van Q4 Profiles. Het zelfbeeld laat zien hoe iemand zichzelf ziet en het is interessant om te kijken in welke mate dit overeenkomt met het natuurlijke kernpatroon van deze persoon.",
+  ]);
+  if (step === 4) return lsTextCard("Herkenningscijfer", [
+    "Direct na het invullen van de vragenlijst wordt de respondent gevraagd een herkenningscijfer te geven. Als de vragen onder ideale omstandigheden beantwoord zijn, in circa 10 minuten en zonder onderbreking of afleiding, dan zal de herkenning waarschijnlijk een 8 of hoger zijn.",
+    "Als de respondenten voor het invullen van de vragenlijst geen instructie hebben gekregen of zich er niet aan hebben gehouden, en daardoor bijvoorbeeld minder gefocust waren, kunnen de herkenningscijfers lager zijn, tussen de 6 en 8. Het is van essentieel belang om die voorinformatie te geven.",
+    "Als het herkenningscijfer lager is dan een 6 is het verstandig contact op te nemen met de respondent. Hiervoor volg je een specifiek protocol.",
+  ]);
+  if (step === 5) return lsTextCard("De inhoud van het profiel", [
+    "De inhoud van het Persoonlijke Stijl (DISC) Profiel, die de respondent ontvangt, is als volgt:",
+    "1. Inleiding &nbsp; 2. Persoonlijke beschrijving &nbsp; 3. Persoonlijke groeimogelijkheden &nbsp; 4. Persoonlijke communicatiestijl: sterkten en valkuilen &nbsp; 5. Persoonlijke Stijl in werkomgeving &nbsp; 6. Communicatievolgorde &nbsp; 7. Persoonlijke Stijl (DISC) achtergronden &nbsp; <strong>8. Persoonlijke Stijlpatronen – Grafieken</strong> &nbsp; 9. Zelfbeeld &nbsp; 10. Communicatietips &nbsp; 11. Q4 Profiles analyses &nbsp; 12. Wie is Q4 Profiles?",
+  ]);
+  if (step === 6) return lsTextCard("Focus op hoofdstuk 8: de grafiek", [
+    "Een groot deel van het profiel kan de respondent zelfstandig doornemen. Ons advies is om dit alleen te laten doen, nadat er een persoonlijke gesprek heeft plaatsgevonden. Vanaf hoofdstuk 8 is namelijk de specifieke kennis van jou als Certified Partner nodig om de grafiek te kunnen interpreteren en uit te kunnen leggen. Wij focussen daarom nu op hoofdstuk 8: Persoonlijke Stijlpatronen – Grafieken.",
+    "De kunst is om de grafieken goed te kunnen lezen, te interpreteren en te verwoorden. Inclusief de nuances, mogelijke verschillen tussen grafiek I en II en eventueel energieverlies te detecteren en te bespreken.",
+    "Naast de veelvoorkomende grafieken, die geen bijzondere of opvallende patronen laten zien, bestaan er ook speciale grafieken: het Laag Energie- (undershift), Hoog Energie- (overshift) en Transitiepatroon, plus de complementaire stijlen.",
+  ]);
+  if (step === 7) return `<div class="gb-card"><h3>Laag Energie (Undershift)</h3><p>Alle temperamenten van het kernpatroon (II) bevinden zich onder de middellijn. Klik op een kolom voor de exacte waarden.</p>${lsPatternGraph("u", { D: { i: 65, ii: 28.5 }, I: { i: 65, ii: 17.5 }, S: { i: 42.5, ii: 23 }, C: { i: 48.5, ii: 11 } })}<p class="gb-sub" style="margin-top:14px">Mogelijke oorzaken:</p><ul style="margin:0 0 0 20px;color:#3c4a63;font-size:.9rem;line-height:1.6"><li>Vragen niet goed begrepen of overgeanalyseerd</li><li>Negatief zelfbeeld/gebrek aan zelfvertrouwen</li><li>Lusteloosheid/ontmoedigd</li></ul></div>`;
+  if (step === 8) return `<div class="gb-card"><h3>Hoog Energie (Overshift)</h3><p>Alle vier de temperamenten bevinden zich bij het kernpatroon (II) boven de middellijn. Klik op een kolom voor de exacte waarden.</p>${lsPatternGraph("o", { D: { i: 65, ii: 71 }, I: { i: 43, ii: 87 }, S: { i: 81.5, ii: 76 }, C: { i: 87, ii: 76 } })}<p class="gb-sub" style="margin-top:14px">Mogelijke oorzaken:</p><ul style="margin:0 0 0 20px;color:#3c4a63;font-size:.9rem;line-height:1.6"><li>Vragen niet goed begrepen of overgeanalyseerd</li><li>Neiging om inspanning te verhogen als reactie op stress</li><li>Neiging tot over presteren</li></ul></div>`;
+  if (step === 9) return `<div class="gb-card"><h3>Transitiepatroon</h3><p>Hier zijn bij het kernpatroon (II) alle vier de temperamenten op en rond de middellijn. Klik op een kolom voor de exacte waarden.</p>${lsPatternGraph("t", { D: { i: 43, ii: 43 }, I: { i: 54, ii: 48.5 }, S: { i: 81.5, ii: 48.5 }, C: { i: 21, ii: 43 } })}<p class="gb-sub" style="margin-top:14px">Mogelijke oorzaken:</p><ul style="margin:0 0 0 20px;color:#3c4a63;font-size:.9rem;line-height:1.6"><li>Vragen niet goed begrepen of overgeanalyseerd</li><li>Respondent zit in veranderingsproces</li><li>Weet niet wat van hem/haar wordt verwacht</li></ul></div>`;
+  if (step === 10) return `<div class="gb-card"><h3>Complementaire stijlen (patroon)</h3><p>De complementaire stijl is geen speciaal patroon, maar verdient wel echt aandacht: een me-me conflict tussen iemands eigen twee voorkeursstijlen (hier D↔S). Klik op een kolom voor de exacte waarden.</p>${lsPatternGraph("c", { D: { i: 87, ii: 70.5 }, I: { i: 21, ii: 26.5 }, S: { i: 32, ii: 87 }, C: { i: 10, ii: 43 } })}<p>Personen met complementaire stijlen in hun kernpatroon (II) zijn vaak lastiger te observeren omdat zij relatief snel kunnen schakelen, flexibel zijn en zich snel kunnen afstemmen op hun omgeving of gesprekspartner.</p></div>`;
+  if (step === 11) return lsMC("Wat kun je met de zelfbeeld uitkomst?", [
+    "Geeft verdieping en extra inzicht",
+    "Bepalen of iemand op zijn/haar plek zit",
+    "Dubbelcheck of de profieluitkomst klopt",
+    "Geeft inzicht in de persoonlijke interesses",
+  ], 0);
+  if (step === 12) return lsCheck("Waarom is het zo belangrijk om de respondent de goede voorinformatie te geven, voor het invullen van de vragenlijst?", [
+    "Om te voorkomen dat de vragen over geanalyseerd worden",
+    "De kans op sociaal wenselijke antwoorden verkleinen",
+    "Zodat de vragenlijst niet te snel wordt ingevuld",
+    "Zodat de vragen goed begrepen worden",
+    "Zodat de vragen met de goede focus gemaakt worden",
+  ], [0, 3, 4]);
+  if (step === 13) return `<div class="gb-card"><h3>Sarah's grafiek</h3><p>Dit is de grafiek van Sarah. Zoals je kunt zien is Sarah een 'Hoog C' (C-kernpatroon = 94, ver boven de 90-lijn). Klik op een kolom voor de exacte waarden.</p>${lsPatternGraph("s", { D: { i: 43, ii: 48.5 }, I: { i: 32, ii: 37.5 }, S: { i: 26.5, ii: 59.5 }, C: { i: 81.5, ii: 94 } })}</div>` +
+    lsMC("Wat zijn de talenten met mensen van Sarah? Sarah:", ["Is enthousiast en motiveert anderen", "Geeft richting en overtuigt anderen", "Stelt de juiste vragen en is diplomatiek"], 2);
+  if (step === 14) return lsMC("Stel iemand heeft een D-uitkomst van 80% en een S van 10%. Wat betekent dit dan? Deze persoon:", [
+    "Kan geen werk met S-eigenschappen doen.",
+    "Heeft van nature veel meer energie om D-dingen te doen dan om S-dingen te doen.",
+    "Kan D-werkzaamheden de hele dag volhouden.",
+  ], 1);
+  if (step === 15) return `<div class="gb-card"><h3>Sarah's grafiek — tegengesteld</h3><p>Dit is de grafiek van Sarah. Klik op een kolom voor de exacte waarden.</p>${lsPatternGraph("r", { D: { i: 87, ii: 70.5 }, I: { i: 21, ii: 26.5 }, S: { i: 32, ii: 87 }, C: { i: 10, ii: 43 } })}</div>` +
+    lsMC("Wat is het tegenovergestelde in deze grafiek?", ["Spontaan en berekenend", "Direct en extravert", "Risico nemend en behoudend"], 2);
+  if (step === 16) return `<div class="gb-card"><h3>Twee grafieken vergelijken</h3><p>Wat vooral opvalt is het verschil tussen het kernpatroon en het gewenst patroon voor het I-temperament.</p>
+    <div class="ls-graphpair">
+      <div><p class="gb-sub">Persoon A</p>${lsPatternGraph("a", { D: { i: 93, ii: 87 }, I: { i: 32, ii: 87 }, S: { i: 26.5, ii: 10 }, C: { i: 15.5, ii: 48.5 } })}</div>
+      <div><p class="gb-sub">Persoon B</p>${lsPatternGraph("b", { D: { i: 37.5, ii: 65 }, I: { i: 87, ii: 48.5 }, S: { i: 54, ii: 65 }, C: { i: 15.5, ii: 48.5 } })}</div>
+    </div></div>` +
+    lsMC("Hoe kan je deze verschillen mogelijk verklaren?", [
+      "Persoon A heeft meer sociale interactie dan Persoon B",
+      "Zowel Persoon A als Persoon B laden de accu op door sociale interactie",
+      "Persoon A haalt energie uit sociale interactie en Persoon B kost het meer energie",
+    ], 2);
+  if (step === 17) return lsCategorize("Koppel elk patroon aan de juiste beschrijving", [
+    { t: "Alle 4 temperamenten liggen onder de middellijn", cat: "Laag Energie (Undershift)" },
+    { t: "Alle 4 temperamenten liggen boven de middellijn", cat: "Hoog Energie (Overshift)" },
+    { t: "Alle 4 temperamenten liggen op of rond de middellijn", cat: "Transitiepatroon" },
+  ], ["Laag Energie (Undershift)", "Hoog Energie (Overshift)", "Transitiepatroon"]);
   return "";
 }
 
@@ -1933,12 +2495,12 @@ document.addEventListener("click", (e) => {
   if (t.hasAttribute("data-back")) { navigate(state.prevRoute || "dashboard", { menuOpen: false }); return; }
   if (t.dataset.route) navigate(t.dataset.route, { menuOpen: false });
   if (t.dataset.course) navigate("course", { activeCourse:Number(t.dataset.course), factFilter:null });
-  if (t.dataset.lesson) navigate("lesson", { activeLesson:t.dataset.lesson, activeCourse:Number(t.dataset.courseId), step:1, selectedAnswer:"", gb:null });
+  if (t.dataset.lesson) navigate("lesson", { activeLesson:t.dataset.lesson, activeCourse:Number(t.dataset.courseId), step:1, selectedAnswer:"", gb:null, ls:null });
   if (t.dataset.trainer) navigate("trainer", { activeCourse:Number(t.dataset.trainer) });
   if (t.dataset.factFilter) navigate("factcards", { factFilter:Number(t.dataset.factFilter) });
   if (t.dataset.factDetail) navigate("factcard", { activeFact:Number(t.dataset.factDetail) });
-  if (t.dataset.step) navigate("lesson", { step:Number(t.dataset.step), selectedAnswer:"", gb:null });
-  if (t.hasAttribute("data-prev-step")) navigate("lesson", { step:Math.max(1,state.step-1), selectedAnswer:"", gb:null });
+  if (t.dataset.step) navigate("lesson", { step:Number(t.dataset.step), selectedAnswer:"", gb:null, ls:null });
+  if (t.hasAttribute("data-prev-step")) navigate("lesson", { step:Math.max(1,state.step-1), selectedAnswer:"", gb:null, ls:null });
   if (t.hasAttribute("data-next-step")) {
     const l = lessonById();
     if (state.step >= l.steps) {
@@ -1952,7 +2514,7 @@ document.addEventListener("click", (e) => {
       }
       navigate("course", { activeCourse:l.courseId });
     }
-    else navigate("lesson", { step:state.step+1, selectedAnswer:"", gb:null });
+    else navigate("lesson", { step:state.step+1, selectedAnswer:"", gb:null, ls:null });
   }
   if (t.dataset.answer) navigate("lesson", { selectedAnswer:t.dataset.answer });
   if (t.dataset.adminTab) navigate("admin", { adminTab:t.dataset.adminTab });
@@ -2023,6 +2585,45 @@ document.addEventListener("click", (e) => {
   }
   if (t.hasAttribute("data-gb-verify-match")) {
     gb.matchResult = gb.order.every((v, i) => v === i);
+    render(); return;
+  }
+});
+
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-ls-mc],[data-ls-verify-mc],[data-ls-tf],[data-ls-verify-tf],[data-ls-check],[data-ls-verify-check],[data-ls-cat],[data-ls-verify-cat],[data-ls-scale],[data-ls-quad],[data-ls-quadall]");
+  if (!t) return;
+  const ls = lsState();
+  if (t.hasAttribute("data-ls-check")) { const i = t.getAttribute("data-ls-check"); ls.checks[i] = !ls.checks[i]; render(); return; }
+  if (t.hasAttribute("data-ls-verify-check")) {
+    const correct = t.getAttribute("data-ls-verify-check").split(",").map(Number);
+    const total = Number(t.getAttribute("data-ls-total"));
+    ls.checkResult = Array.from({ length: total }, (_, i) => !!ls.checks[i] === correct.includes(i)).every(Boolean);
+    render(); return;
+  }
+  if (t.hasAttribute("data-ls-mc")) { ls.mc = t.getAttribute("data-ls-mc"); render(); return; }
+  if (t.hasAttribute("data-ls-verify-mc")) { ls.mcResult = ls.mc === t.getAttribute("data-ls-verify-mc"); render(); return; }
+  if (t.hasAttribute("data-ls-tf")) { ls.tf = t.getAttribute("data-ls-tf"); render(); return; }
+  if (t.hasAttribute("data-ls-verify-tf")) { ls.tfResult = ls.tf === t.getAttribute("data-ls-verify-tf"); render(); return; }
+  if (t.hasAttribute("data-ls-cat")) {
+    const [idx, cat] = t.getAttribute("data-ls-cat").split(":");
+    ls.cats[idx] = cat;
+    render(); return;
+  }
+  if (t.hasAttribute("data-ls-verify-cat")) {
+    const pairs = t.getAttribute("data-ls-verify-cat").split("|").map(s => s.split(":"));
+    ls.catResult = pairs.every(([idx, cat]) => ls.cats[idx] === cat);
+    render(); return;
+  }
+  if (t.hasAttribute("data-ls-scale")) {
+    const [axis, val] = t.getAttribute("data-ls-scale").split(":");
+    ls[axis] = Number(val);
+    render(); return;
+  }
+  if (t.hasAttribute("data-ls-quad")) { const id = t.getAttribute("data-ls-quad"); ls.quad[id] = !ls.quad[id]; render(); return; }
+  if (t.hasAttribute("data-ls-quadall")) {
+    const ids = t.getAttribute("data-ls-quadall").split(",");
+    const allOpen = ids.every(id => ls.quad[id]);
+    ids.forEach(id => { ls.quad[id] = !allOpen; });
     render(); return;
   }
 });

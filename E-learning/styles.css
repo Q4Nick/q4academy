@@ -895,3 +895,50 @@ img.course-img {
 .gb-mbtns button { border: 1px solid #b9c6dd; background: #fff; border-radius: 6px; width: 26px; height: 22px; cursor: pointer; color: #2563eb; font-size: .75rem; line-height: 1; }
 .gb-mbtns button:disabled { opacity: .35; cursor: default; }
 @media (max-width: 860px) { .gb-flex { flex-direction: column; } }
+
+/* Generic lesson-content engine (ls-*) — reuses gb-* tokens above */
+.ls-catrow { align-items: center; flex-wrap: wrap; }
+.ls-catbtns { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+.ls-catbtn { width: auto; padding: 7px 12px; font-size: .82rem; }
+.ls-scalerow { flex-direction: row; flex-wrap: wrap; }
+.ls-scalerow .gb-opt { width: auto; padding: 8px 12px; font-size: .82rem; }
+.ls-axiswrap { position: relative; max-width: 420px; margin: 14px auto 18px; }
+.ls-axissvg { display: block; width: 100%; background: #f4efe9; border-radius: 12px; }
+.ls-axislabel { position: absolute; font-size: .68rem; font-weight: 700; letter-spacing: .04em; color: #7c8aa0; }
+.ls-axis-top { top: -18px; left: 50%; transform: translateX(-50%); }
+.ls-axis-bottom { bottom: -18px; left: 50%; transform: translateX(-50%); }
+.ls-axis-left { left: -8px; top: 50%; transform: translate(-100%, -50%); }
+.ls-axis-right { right: -8px; top: 50%; transform: translate(100%, -50%); }
+.ls-quadwrap { position: relative; max-width: 640px; margin: 30px auto 20px; padding: 0 34px; }
+.ls-quadgrid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 3px; border-radius: 12px; overflow: hidden; }
+.ls-qcell { position: relative; min-height: 150px; padding: 14px; color: #fff; }
+.ls-qlabel { display: block; font-weight: 700; font-size: .92rem; }
+.ls-qlabel small { display: block; font-weight: 500; font-size: .68rem; opacity: .85; margin-top: 2px; }
+.ls-qpop { position: static; margin-top: 10px; background: rgba(255,255,255,.96); color: #17233c; padding: 10px 12px; }
+.ls-qpop p { color: #3c4a63; font-size: .78rem; line-height: 1.5; }
+.ls-qedge { position: absolute; font-size: .68rem; font-weight: 700; letter-spacing: .06em; color: #7c8aa0; }
+.ls-qedge-top { top: -16px; left: 50%; transform: translateX(-50%); }
+.ls-qedge-bottom { bottom: -16px; left: 50%; transform: translateX(-50%); }
+.ls-qedge-left { left: 0; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; }
+.ls-qedge-right { right: 0; top: 50%; transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; }
+.ls-quadwrap .gb-openall { position: static; margin: 14px auto 0; display: block; }
+.ls-factrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.ls-factchip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #e4e9f1; border-radius: 10px; padding: 9px 14px; background: #fff; cursor: pointer; font-size: .85rem; color: #17233c; }
+.ls-factchip:hover { border-color: #b9c6dd; }
+.ls-factchip svg { width: 14px; height: 14px; color: #2563eb; }
+.ls-factdot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+@media (max-width: 640px) { .ls-quadwrap { padding: 0 20px; } .ls-qcell { min-height: 130px; padding: 10px; } }
+.ls-graphwrap { position: relative; display: flex; gap: 18px; align-items: flex-end; height: 220px; padding: 10px 24px 0; background: #f4efe9; border-radius: 12px; margin: 14px 0; }
+.ls-graphband { position: absolute; left: 0; right: 0; top: 43%; height: 12%; background: rgba(37,99,235,.08); }
+.ls-graphcol { position: relative; flex: 1; height: 180px; display: flex; flex-direction: column-reverse; align-items: center; border: none; background: transparent; cursor: pointer; padding: 0; }
+.ls-graphbar { width: 56%; border-radius: 4px 4px 0 0; min-height: 2px; }
+.ls-graphdot { position: absolute; left: 50%; transform: translate(-50%, 50%); width: 11px; height: 11px; border-radius: 50%; background: #17233c; border: 2px solid #fff; box-shadow: 0 0 0 1px #b9c6dd; }
+.ls-graphletter { position: absolute; bottom: -26px; font-weight: 700; color: #17233c; font-size: .85rem; }
+.ls-graphlegend { display: flex; gap: 18px; margin: 30px 0 4px; font-size: .75rem; color: #7c8aa0; flex-wrap: wrap; }
+.ls-legendgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.ls-legenditem strong { display: block; color: #17233c; font-size: .85rem; margin-bottom: 4px; }
+.ls-legenditem span { color: #3c4a63; font-size: .82rem; line-height: 1.5; }
+.ls-graphpair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
+.ls-graphpair .ls-graphwrap { height: 170px; }
+.ls-graphpair .ls-graphcol { height: 140px; }
+@media (max-width: 700px) { .ls-graphpair { grid-template-columns: 1fr; } }
