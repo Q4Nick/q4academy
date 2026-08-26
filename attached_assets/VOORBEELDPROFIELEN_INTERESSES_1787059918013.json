@@ -1,0 +1,145 @@
+{
+  "instrument": "Interesses",
+  "type": "voorbeeldprofielen",
+  "bronmap": "voorbeeldprofielen",
+  "interpretatie": {
+    "hoogste": "Rang 1-4: positieve werkinteresses; rang 1 en 2 vormen de profieluitkomst en geven de meest wenselijke en bevredigende werktypen.",
+    "situationeel": "Rang 5-8: neutrale of situationele werkinteresses; verdraagbaar, maar niet vanzelf motiverend.",
+    "desinteresses": "Rang 9-12: werkdesinteresses; werktypen die minder motiveren, weerstand oproepen of mismatch kunnen veroorzaken.",
+    "let_op": "Deze voorbeeldprofielen tonen motivatie en voorkeur, niet automatisch vaardigheid of prestatie."
+  },
+  "profielen": [
+    {
+      "id": "ar",
+      "bestand": "Interesses AR.pdf",
+      "uitkomst": "AUTORITEIT/RELATIONEEL",
+      "hoogste": ["AUTORITEIT", "RELATIONEEL", "HELPEND", "HUMANITAIR"],
+      "situationeel": ["FYSIEK", "TECHNISCH", "INTELLECTUEEL", "ECONOMISCH"],
+      "desinteresses": ["ROUTINEMATIG", "ARTISTIEK", "STATUS", "ONDERNEMERSCHAP"],
+      "rangorde": [
+        {"rank": 1, "gebied": "AUTORITEIT"},
+        {"rank": 2, "gebied": "RELATIONEEL"},
+        {"rank": 3, "gebied": "HELPEND"},
+        {"rank": 4, "gebied": "HUMANITAIR"},
+        {"rank": 5, "gebied": "FYSIEK"},
+        {"rank": 6, "gebied": "TECHNISCH"},
+        {"rank": 7, "gebied": "INTELLECTUEEL"},
+        {"rank": 8, "gebied": "ECONOMISCH"},
+        {"rank": 9, "gebied": "ROUTINEMATIG"},
+        {"rank": 10, "gebied": "ARTISTIEK"},
+        {"rank": 11, "gebied": "STATUS"},
+        {"rank": 12, "gebied": "ONDERNEMERSCHAP"}
+      ]
+    },
+    {
+      "id": "ft",
+      "bestand": "Interesses FT.pdf",
+      "uitkomst": "FYSIEK/TECHNISCH",
+      "hoogste": ["FYSIEK", "TECHNISCH", "INTELLECTUEEL", "ECONOMISCH"],
+      "situationeel": ["ROUTINEMATIG", "ARTISTIEK", "STATUS", "ONDERNEMERSCHAP"],
+      "desinteresses": ["AUTORITEIT", "RELATIONEEL", "HELPEND", "HUMANITAIR"],
+      "rangorde": [
+        {"rank": 1, "gebied": "FYSIEK"},
+        {"rank": 2, "gebied": "TECHNISCH"},
+        {"rank": 3, "gebied": "INTELLECTUEEL"},
+        {"rank": 4, "gebied": "ECONOMISCH"},
+        {"rank": 5, "gebied": "ROUTINEMATIG"},
+        {"rank": 6, "gebied": "ARTISTIEK"},
+        {"rank": 7, "gebied": "STATUS"},
+        {"rank": 8, "gebied": "ONDERNEMERSCHAP"},
+        {"rank": 9, "gebied": "AUTORITEIT"},
+        {"rank": 10, "gebied": "RELATIONEEL"},
+        {"rank": 11, "gebied": "HELPEND"},
+        {"rank": 12, "gebied": "HUMANITAIR"}
+      ]
+    },
+    {
+      "id": "hh",
+      "bestand": "Interesses HH.pdf",
+      "uitkomst": "HELPEND/HUMANITAIR",
+      "hoogste": ["HELPEND", "HUMANITAIR", "FYSIEK", "TECHNISCH"],
+      "situationeel": ["INTELLECTUEEL", "ECONOMISCH", "ROUTINEMATIG", "ARTISTIEK"],
+      "desinteresses": ["STATUS", "ONDERNEMERSCHAP", "AUTORITEIT", "RELATIONEEL"],
+      "rangorde": [
+        {"rank": 1, "gebied": "HELPEND"},
+        {"rank": 2, "gebied": "HUMANITAIR"},
+        {"rank": 3, "gebied": "FYSIEK"},
+        {"rank": 4, "gebied": "TECHNISCH"},
+        {"rank": 5, "gebied": "INTELLECTUEEL"},
+        {"rank": 6, "gebied": "ECONOMISCH"},
+        {"rank": 7, "gebied": "ROUTINEMATIG"},
+        {"rank": 8, "gebied": "ARTISTIEK"},
+        {"rank": 9, "gebied": "STATUS"},
+        {"rank": 10, "gebied": "ONDERNEMERSCHAP"},
+        {"rank": 11, "gebied": "AUTORITEIT"},
+        {"rank": 12, "gebied": "RELATIONEEL"}
+      ]
+    },
+    {
+      "id": "ie",
+      "bestand": "Interesses IE.pdf",
+      "uitkomst": "INTELLECTUEEL/ECONOMISCH",
+      "hoogste": ["INTELLECTUEEL", "ECONOMISCH", "ROUTINEMATIG", "ARTISTIEK"],
+      "situationeel": ["STATUS", "ONDERNEMERSCHAP", "AUTORITEIT", "RELATIONEEL"],
+      "desinteresses": ["HELPEND", "HUMANITAIR", "FYSIEK", "TECHNISCH"],
+      "rangorde": [
+        {"rank": 1, "gebied": "INTELLECTUEEL"},
+        {"rank": 2, "gebied": "ECONOMISCH"},
+        {"rank": 3, "gebied": "ROUTINEMATIG"},
+        {"rank": 4, "gebied": "ARTISTIEK"},
+        {"rank": 5, "gebied": "STATUS"},
+        {"rank": 6, "gebied": "ONDERNEMERSCHAP"},
+        {"rank": 7, "gebied": "AUTORITEIT"},
+        {"rank": 8, "gebied": "RELATIONEEL"},
+        {"rank": 9, "gebied": "HELPEND"},
+        {"rank": 10, "gebied": "HUMANITAIR"},
+        {"rank": 11, "gebied": "FYSIEK"},
+        {"rank": 12, "gebied": "TECHNISCH"}
+      ]
+    },
+    {
+      "id": "ra",
+      "bestand": "Interesses RA.pdf",
+      "uitkomst": "ROUTINEMATIG/ARTISTIEK",
+      "hoogste": ["ROUTINEMATIG", "ARTISTIEK", "STATUS", "ONDERNEMERSCHAP"],
+      "situationeel": ["AUTORITEIT", "RELATIONEEL", "HELPEND", "HUMANITAIR"],
+      "desinteresses": ["FYSIEK", "TECHNISCH", "INTELLECTUEEL", "ECONOMISCH"],
+      "rangorde": [
+        {"rank": 1, "gebied": "ROUTINEMATIG"},
+        {"rank": 2, "gebied": "ARTISTIEK"},
+        {"rank": 3, "gebied": "STATUS"},
+        {"rank": 4, "gebied": "ONDERNEMERSCHAP"},
+        {"rank": 5, "gebied": "AUTORITEIT"},
+        {"rank": 6, "gebied": "RELATIONEEL"},
+        {"rank": 7, "gebied": "HELPEND"},
+        {"rank": 8, "gebied": "HUMANITAIR"},
+        {"rank": 9, "gebied": "FYSIEK"},
+        {"rank": 10, "gebied": "TECHNISCH"},
+        {"rank": 11, "gebied": "INTELLECTUEEL"},
+        {"rank": 12, "gebied": "ECONOMISCH"}
+      ]
+    },
+    {
+      "id": "so",
+      "bestand": "Interesses SO.pdf",
+      "uitkomst": "STATUS/ONDERNEMERSCHAP",
+      "hoogste": ["STATUS", "ONDERNEMERSCHAP", "AUTORITEIT", "RELATIONEEL"],
+      "situationeel": ["HELPEND", "HUMANITAIR", "FYSIEK", "TECHNISCH"],
+      "desinteresses": ["INTELLECTUEEL", "ECONOMISCH", "ROUTINEMATIG", "ARTISTIEK"],
+      "rangorde": [
+        {"rank": 1, "gebied": "STATUS"},
+        {"rank": 2, "gebied": "ONDERNEMERSCHAP"},
+        {"rank": 3, "gebied": "AUTORITEIT"},
+        {"rank": 4, "gebied": "RELATIONEEL"},
+        {"rank": 5, "gebied": "HELPEND"},
+        {"rank": 6, "gebied": "HUMANITAIR"},
+        {"rank": 7, "gebied": "FYSIEK"},
+        {"rank": 8, "gebied": "TECHNISCH"},
+        {"rank": 9, "gebied": "INTELLECTUEEL"},
+        {"rank": 10, "gebied": "ECONOMISCH"},
+        {"rank": 11, "gebied": "ROUTINEMATIG"},
+        {"rank": 12, "gebied": "ARTISTIEK"}
+      ]
+    }
+  ]
+}

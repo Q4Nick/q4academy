@@ -1,0 +1,87 @@
+{
+  "instrument": "Interesses",
+  "type": "voorbeeldprofiel_verbindingen",
+  "regels": {
+    "shared_high": "Gedeelde hoogste interesses: positief klik- en energiesignaal.",
+    "high_vs_disinterest": "Hoog bij de een en desinteresse bij de ander: frictie-, rolmismatch- of energieverliessignaal.",
+    "shared_disinterest": "Gedeelde desinteresse: taakgebied krijgt waarschijnlijk weinig natuurlijke energie in dit duo.",
+    "high_vs_situational": "Hoog bij de een en situationeel bij de ander: bruikbaar als tijdelijke brug, niet als duurzame energiebron."
+  },
+  "duos": [
+    {
+      "duo": ["AR", "HH"],
+      "type": "positieve_overlap_met_asymmetrie",
+      "shared_high": ["HELPEND", "HUMANITAIR"],
+      "frictie": ["AUTORITEIT", "RELATIONEEL zijn hoog bij AR maar desinteresse bij HH"],
+      "hypothese": "Gedeelde bijdrage- en betekenistaal, maar verschil in behoefte aan richting/autoriteit en relationele sturing."
+    },
+    {
+      "duo": ["AR", "SO"],
+      "type": "positieve_overlap_met_asymmetrie",
+      "shared_high": ["AUTORITEIT", "RELATIONEEL"],
+      "frictie": ["STATUS", "ONDERNEMERSCHAP zijn hoog bij SO maar desinteresse bij AR"],
+      "hypothese": "Overlap in invloed en relationele positionering, maar spanning rond prestige, competitie en ondernemend risico."
+    },
+    {
+      "duo": ["FT", "HH"],
+      "type": "positieve_overlap_met_asymmetrie",
+      "shared_high": ["FYSIEK", "TECHNISCH"],
+      "frictie": ["HELPEND", "HUMANITAIR zijn hoog bij HH maar desinteresse bij FT"],
+      "hypothese": "Overlap in praktische toepassing, maar verschil tussen concrete taakenergie en helpende/betekenisgerichte energie."
+    },
+    {
+      "duo": ["FT", "IE"],
+      "type": "positieve_overlap_met_asymmetrie",
+      "shared_high": ["INTELLECTUEEL", "ECONOMISCH"],
+      "frictie": ["FYSIEK", "TECHNISCH zijn hoog bij FT maar desinteresse bij IE"],
+      "hypothese": "Overlap op analyse, kennis en resultaat, maar spanning wanneer het te fysiek, technisch of toepassingsgericht wordt."
+    },
+    {
+      "duo": ["IE", "RA"],
+      "type": "positieve_overlap_met_asymmetrie",
+      "shared_high": ["ROUTINEMATIG", "ARTISTIEK"],
+      "frictie": ["INTELLECTUEEL", "ECONOMISCH zijn hoog bij IE maar desinteresse bij RA"],
+      "hypothese": "Overlap in structuur en vorm, maar verschil tussen analyse/resultaat en maakritme/expressie."
+    },
+    {
+      "duo": ["RA", "SO"],
+      "type": "positieve_overlap_met_asymmetrie",
+      "shared_high": ["STATUS", "ONDERNEMERSCHAP"],
+      "frictie": ["ROUTINEMATIG", "ARTISTIEK zijn hoog bij RA maar desinteresse bij SO"],
+      "hypothese": "Overlap in zichtbaarheid en ondernemende energie, maar spanning rond routine, uitwerking en artistieke vorm."
+    },
+    {
+      "duo": ["AR", "FT"],
+      "type": "sterke_mismatch",
+      "shared_high": [],
+      "frictie": ["AUTORITEIT", "RELATIONEEL", "HELPEND", "HUMANITAIR zijn hoog bij AR maar desinteresse bij FT"],
+      "hypothese": "FT kan weinig energie krijgen van AR's mensgerichte bijdrage- en invloedstaal; AR ervaart FT's topgebieden eerder situationeel."
+    },
+    {
+      "duo": ["FT", "RA"],
+      "type": "sterke_mismatch",
+      "shared_high": [],
+      "frictie": ["FYSIEK", "TECHNISCH", "INTELLECTUEEL", "ECONOMISCH zijn hoog bij FT maar desinteresse bij RA"],
+      "hypothese": "RA kan weerstand voelen tegen FT's fysieke, technische, intellectuele en economische taakdruk."
+    },
+    {
+      "duo": ["HH", "IE"],
+      "type": "sterke_mismatch",
+      "shared_high": [],
+      "frictie": ["HELPEND", "HUMANITAIR", "FYSIEK", "TECHNISCH zijn hoog bij HH maar desinteresse bij IE"],
+      "hypothese": "IE kan weinig energie krijgen van HH's helpende, humanitaire, fysieke of technische focus."
+    },
+    {
+      "duo": ["IE", "SO"],
+      "type": "sterke_mismatch",
+      "shared_high": [],
+      "frictie": ["INTELLECTUEEL", "ECONOMISCH", "ROUTINEMATIG", "ARTISTIEK zijn hoog bij IE maar desinteresse bij SO"],
+      "hypothese": "SO kan weinig energie krijgen van IE's analyse, economische ordening, routine en artistieke uitwerking."
+    }
+  ],
+  "teamhypothese": {
+    "dekking": "Samen dekken de zes voorbeeldprofielen alle 12 interessegebieden in positieve, situationele en negatieve zones.",
+    "kracht": "Breed team: inhoud, toepassing, structuur, ondernemerschap, richting, relatie en betekenis zijn allemaal vertegenwoordigd.",
+    "risico": "Wat voor de een energie is, kan voor een ander desinteresse zijn. Teamadvies moet daarom focussen op rolverdeling en energiezones."
+  }
+}

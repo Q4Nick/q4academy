@@ -1,0 +1,112 @@
+{
+  "instrument": "Interesses",
+  "bronnen": [
+    {
+      "bestand": "4_Interesses presentatie 2023.pptx",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Trainingen/_Q4 certificatie_training/Certificatie trainingsmateriaal/NL/3_Interesses/4_Interesses presentatie 2023.pptx",
+      "gebruikt_als": "Basis voor interessegebieden, interpretatieregels en verbanden met DISC en Waarden"
+    },
+    {
+      "bestand": "5_Construct Validity Interesses 2023.docx",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Trainingen/_Q4 certificatie_training/Certificatie trainingsmateriaal/NL/3_Interesses/5_Construct Validity Interesses 2023.docx",
+      "gebruikt_als": "Onderbouwing voor constructvaliditeit, onderzoeksherkomst en positionering ten opzichte van behoeften en waarden"
+    },
+    {
+      "bestand": "Q4 Certificatie Interesses handboek_NL - Hst2 Maak de zinnen compleet.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Trainingen/_Q4 certificatie_training/Certificatie trainingsmateriaal/NL/3_Interesses/Q4 Certificatie Interesses handboek_NL - Hst2 Maak de zinnen compleet.pdf",
+      "gebruikt_als": "Bevestiging van de ingevulde concepten I-IV, inclusief energie, intensiteit, neutrale zone, werk-prive match en twaalf interessegebieden"
+    },
+    {
+      "bestand": "voorbeeldprofielen/Interesses AR.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Q4 Profiles ontwikkeling/RAG AI Gabriel/Interesses profielen 6x/Interesses AR.pdf",
+      "gebruikt_als": "Voorbeeldprofiel met uitkomst Autoriteit/Relationeel"
+    },
+    {
+      "bestand": "voorbeeldprofielen/Interesses FT.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Q4 Profiles ontwikkeling/RAG AI Gabriel/Interesses profielen 6x/Interesses FT.pdf",
+      "gebruikt_als": "Voorbeeldprofiel met uitkomst Fysiek/Technisch"
+    },
+    {
+      "bestand": "voorbeeldprofielen/Interesses HH.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Q4 Profiles ontwikkeling/RAG AI Gabriel/Interesses profielen 6x/Interesses HH.pdf",
+      "gebruikt_als": "Voorbeeldprofiel met uitkomst Helpend/Humanitair"
+    },
+    {
+      "bestand": "voorbeeldprofielen/Interesses IE.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Q4 Profiles ontwikkeling/RAG AI Gabriel/Interesses profielen 6x/Interesses IE.pdf",
+      "gebruikt_als": "Voorbeeldprofiel met uitkomst Intellectueel/Economisch"
+    },
+    {
+      "bestand": "voorbeeldprofielen/Interesses RA.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Q4 Profiles ontwikkeling/RAG AI Gabriel/Interesses profielen 6x/Interesses RA.pdf",
+      "gebruikt_als": "Voorbeeldprofiel met uitkomst Routinematig/Artistiek"
+    },
+    {
+      "bestand": "voorbeeldprofielen/Interesses SO.pdf",
+      "origineel_pad": "C:/Users/Nick Ramdjanamsingh/OneDrive - Q4Profiles BV/01 Synques/Q4 Profiles ontwikkeling/RAG AI Gabriel/Interesses profielen 6x/Interesses SO.pdf",
+      "gebruikt_als": "Voorbeeldprofiel met uitkomst Status/Ondernemerschap"
+    }
+  ],
+  "kernprincipes": [
+    "Interesses worden zichtbaar in waar iemand tijd, energie, middelen of geld aan besteedt.",
+    "Hoge werkinteresses geven de meeste voldoening.",
+    "Lage werkinteresses beschrijven desinteresses en mogelijke weerstand.",
+    "Interesses verklaren motivatie en demotivatie, maar niet automatisch vaardigheid.",
+    "Werk-prive match wijst op vergelijkbare drijfveren in beide omgevingen.",
+    "Motivatieprofiel = DISC + Waarden + Interesses: HOE, WAAROM en WAT iemand doet.",
+    "Interesses zijn verwant aan motiverende behoeften en waarden, maar onderscheiden zich als eigen laag van aantrekkingskracht tot activiteiten.",
+    "Het Q4-interessemodel sluit aan op oudere interesse- en loopbaanmodellen, waaronder Holland en Schein, en verbreedt die naar werk- en niet-werkinteresses.",
+    "De neutrale zone beschrijft situationele interesses: verdraagbaar maar niet vanzelf motiverend.",
+    "Interesses worden gelezen als positieve en negatieve energie ten opzichte van werk- en priveactiviteiten.",
+    "Twee personen kunnen even getalenteerd zijn voor een functie maar sterk verschillen in motivatie, passie en lange-termijn continuiteit."
+  ],
+  "assen": [
+    "Dingen versus Mensen",
+    "Praktisch versus Abstract"
+  ],
+  "interessegebieden": [
+    "Fysiek",
+    "Technisch",
+    "Intellectueel",
+    "Economisch",
+    "Routinematig",
+    "Artistiek",
+    "Status",
+    "Ondernemerschap",
+    "Autoriteit",
+    "Relationeel",
+    "Helpend",
+    "Humanitair"
+  ],
+  "app_verwerking": [
+    "Interessegebieden toegevoegd aan app.js als kennisobject met signalen, energiebron, risico en as.",
+    "Probleemtekst detecteert interessewoorden en bewaart maximaal vier herkende gebieden.",
+    "Adviesdossier toont een aparte interesseslaag met interpretatieregel.",
+    "Botadvies legt verband tussen Interesses, DISC en Waarden.",
+    "Interesseslaag toont nu ook construct-validiteit: interesses zijn eigenstandig naast behoeften en waarden.",
+    "Interesseslaag toont nu ook de neutrale zone als situationele interpretatie.",
+    "Zes voorbeeldprofielen toegevoegd als casusdatabank voor rangorde, match, situationele inzet en mismatch."
+  ],
+  "synthese_bestanden": [
+    {
+      "bestand": "BRON_VERBANDEN_INTERESSES.md",
+      "beschrijving": "Legt verbanden tussen presentatie, construct-validity document en handboekhoofdstuk, inclusief vertaling naar adviesbot-regels."
+    },
+    {
+      "bestand": "VOORBEELDPROFIELEN_INTERESSES.json",
+      "beschrijving": "Machineleesbare databank met zes voorbeeldprofielen, profieluitkomst, hoogste interesses, situationele interesses, desinteresses en volledige rangorde."
+    },
+    {
+      "bestand": "VOORBEELDPROFIELEN_INTERESSES.md",
+      "beschrijving": "Leesbare samenvatting van de zes voorbeeldprofielen en hun gebruik als testcases voor de adviesbot."
+    },
+    {
+      "bestand": "VERBINDINGEN_VOORBEELDPROFIELEN_INTERESSES.md",
+      "beschrijving": "Leesbare verbindingskaart tussen de zes voorbeeldprofielen, inclusief overlap, mismatch, asymmetrie en teamhypotheses."
+    },
+    {
+      "bestand": "VERBINDINGEN_VOORBEELDPROFIELEN_INTERESSES.json",
+      "beschrijving": "Machineleesbare duo- en teamrelaties tussen de zes voorbeeldprofielen voor latere regelengine-verwerking."
+    }
+  ]
+}

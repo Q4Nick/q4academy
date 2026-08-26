@@ -1,0 +1,2 @@
+- [E-learning dir is read-only for new files](e-learning-readonly.md) — edit existing files via Python `open(...,'w')`, not the Edit tool; embed assets as base64.
+- [EQ-i wheel embed pattern](eqi-wheel-embed.md) — wheel HTML lives in a JSON-string constant with a __EQI_STEP__ placeholder; height via postMessage, never fixed px.

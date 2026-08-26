@@ -1,0 +1,51 @@
+Bouw/update **alleen de cursusoverzicht-pagina van "De basis van DISC"** (route `/dashboard/courses/1` of equivalent in dit project). Raak geen andere pagina's aan.
+
+**Belangrijk:** de **Trainer-pill** en de **Factcards-pill** die nu al onderaan deze pagina staan, laat je qua stijl en opbouw volledig ongewijzigd — die bevallen mij goed zoals ze zijn. Verplaats of herstyle ze niet; alleen de secties hierboven (hero, voortgang, lessenlijst, video) worden vernieuwd.
+
+### 1. Hero-sectie
+
+Breedbeeld kaart met afgeronde hoeken, donkerblauwe achtergrond (gradient/vlak blauw) met de meegeleverde afbeelding `disc-basis-hero.webp` (foto van een man, rechts uitgelijnd, vloeit over in de blauwe achtergrond) rechts in de kaart.
+
+Tekst linksboven in de kaart, wit:
+
+- **Titel:** `De basis van DISC`
+- **Beschrijving (exacte tekst, niet aanpassen):**
+  > Mensen verschillen van elkaar. Gelukkig maar, anders zou het veel minder kleurrijk en dynamisch zijn in ons dagelijks leven. We weten niet wat de ander denkt, voelt of bedoelt. We interpreteren andermans gedrag vanuit ons eigen perspectief met onze eigen behoeften en bedoelingen. Als we daar inzicht in krijgen dan kunnen we elkaar beter begrijpen. In deze box leer je meer over gewoontes en gedragsvoorkeuren. Na deze box begrijp je de basis van DISC en het menselijk gedrag.
+- **Metadata-rij onder de tekst** (kleine iconen + tekst, wit/semi-transparant): boek-icoon `3 lessen`, vinkje-icoon `3 voltooid`.
+- Boven de kaart: terug-link `← Terug naar dashboard`.
+
+### 2. Voortgangssectie
+
+Witte kaart direct onder de hero:
+
+- Titel `Je voortgang`
+- Subtekst `Je bent {progress}% door deze cursus` (dynamisch, niet hardcoded — bereken uit voltooide lessen)
+- Volledige breedte voortgangsbalk (blauw gevuld naar verhouding)
+- Onderschrift `{aantal} van {totaal} lessen voltooid`
+
+### 3. Lessenlijst + video
+
+Sectiekop `Lessen`, daaronder drie rijen (witte kaarten, elk met):
+
+- links: `LES {n}`, statuspill (groen vinkje `Voltooid` als afgerond), duur-icoon + `{n} min`, daaronder de lestitel in vet
+- rechts: blauwe knop `Bekijk opnieuw →` (of `Start →` als nog niet gestart)
+
+Lessen in deze volgorde:
+1. LES 1 — Voltooid — 24 min — **De basis van menselijk gedrag**
+2. LES 2 — Voltooid — 23 min — **Van menselijk gedrag naar DISC**
+3. LES 3 — Voltooid — 23 min — **De basis van DISC**
+
+**Tussen LES 2 en LES 3** komt een ingesloten video (eigen witte kaart, gecentreerd player): embed de Vimeo-video via URL `https://vimeo.com/574358629/03f4f203c0?fl=pl&fe=cm` (responsive iframe, 16:9, met Vimeo-eigen controls/branding zoals in het origineel — duur in de video zelf is 05:21, dat hoeft niet hardcoded te worden, dat toont Vimeo automatisch).
+
+### Niet aanpassen
+
+- Sectie **Trainer** (donkere pill met badge "Timed Quiz", titel, vraagaantal/percentage, beste score, knop) — ongewijzigd laten staan.
+- Sectie **Factcards** (groene pill met titel, aantal factcards, knop "Bekijk factcards") — ongewijzigd laten staan.
+- Topnavigatie (logo, Dashboard/Factcards/Voortgang/Admin, taalwissel NL/EN, avatar) — ongewijzigd laten staan.
+
+### Acceptatiecriteria
+
+- Hero toont de meegeleverde afbeelding, de exacte titel en beschrijving hierboven, en de juiste metadata.
+- Voortgang en lessenstatussen zijn dynamisch berekend, niet hardcoded op "100%"/"3 van 3".
+- Video tussen les 2 en 3 speelt de Vimeo-bron af.
+- Trainer- en Factcards-pill zien er visueel identiek uit aan de huidige implementatie (geen layout-, kleur- of structuurwijzigingen).

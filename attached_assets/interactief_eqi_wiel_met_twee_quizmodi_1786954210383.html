@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Interactief EQ-i 2.0 Wiel</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --ink:#14213d;
+    --muted:#66758f;
+    --line:#dbe3ef;
+    --center:#173b8f;
+    --zp:#bd3d3a;
+    --ze:#bd6a31;
+    --ip:#aa9635;
+    --bv:#547b34;
+    --sm:#3d708d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,#f8faff 0%,var(--bg) 100%);
+  }
+  .page{max-width:1180px;margin:auto;padding:24px 16px 40px}
+  h1{margin:0;text-align:center;font-size:clamp(28px,5vw,50px);line-height:1.05}
+  .intro{max-width:760px;margin:12px auto 20px;text-align:center;color:var(--muted);font-size:clamp(15px,2.3vw,20px)}
+  .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;margin:0 auto 20px}
+  .legend span{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:#34425d}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:18px;align-items:stretch}
+  .card{
+    background:var(--card);
+    border:1px solid #dbe4f0;
+    border-radius:24px;
+    box-shadow:0 12px 40px rgba(36,59,93,.09);
+    overflow:hidden;
+  }
+  .wheel-card{position:relative;min-height:690px}
+  #wheel{width:100%;height:100%;min-height:690px;display:block;touch-action:manipulation}
+  .panel{padding:22px;display:flex;flex-direction:column;gap:14px}
+  .panel h2{font-size:20px;margin:0}
+  .panel p{margin:0;color:var(--muted);line-height:1.45}
+  .selected{
+    border-left:5px solid var(--center);
+    background:#f4f7ff;
+    padding:14px;
+    border-radius:12px;
+  }
+  .selected strong{display:block;font-size:18px;margin-bottom:7px}
+  .selected .group-name{display:block;font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px}
+  .selected .meaning{display:block;color:#33415c;line-height:1.5}
+  .connections{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+  .relationship-toggle{display:none;width:100%;background:#fff;color:#173b8f;border:1.5px solid #173b8f}
+  .relationship-toggle.visible{display:block}
+  .relationship-toggle[aria-pressed="true"]{background:#173b8f;color:#fff}
+  .extra-heading{margin:3px 0 0;font-size:15px;color:#34425d}
+  .relation-note{font-size:12px;color:var(--muted);margin-top:5px}
+  .connection-card{
+    border-left:5px solid var(--center);
+    background:#f4f7ff;
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .connection-card summary{
+    cursor:pointer;
+    padding:14px;
+    list-style:none;
+    position:relative;
+    padding-right:42px;
+  }
+  .connection-card summary::-webkit-details-marker{display:none}
+  .connection-card summary::after{
+    content:"+";
+    position:absolute;right:15px;top:50%;transform:translateY(-50%);
+    width:25px;height:25px;border-radius:50%;
+    display:grid;place-items:center;background:#fff;color:#173b8f;
+    font-size:19px;font-weight:800;box-shadow:0 2px 7px rgba(36,59,93,.12);
+  }
+  .connection-card[open] summary::after{content:"−"}
+  .connection-card summary strong{display:block;font-size:18px;margin-bottom:7px}
+  .connection-card summary .group-name{display:block;font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+  .connection-content{padding:0 14px 14px}
+  .connection-content .meaning{display:block;color:#33415c;line-height:1.5}
+  .tip{font-size:13px;color:var(--muted);border-top:1px solid #e5ebf4;padding-top:14px}
+  button{
+    border:0;background:#173b8f;color:#fff;padding:12px 15px;border-radius:12px;
+    font:inherit;font-weight:700;cursor:pointer
+  }
+  button:hover{filter:brightness(1.08)}
+  .copyright{text-align:center;color:#71809a;font-size:13px;margin-top:18px}
+  svg text{user-select:none}
+  .link{stroke:var(--line);stroke-width:1.1;opacity:.62;transition:opacity .22s,stroke .22s,stroke-width .22s}
+  .link.active{stroke:#173b8f;stroke-width:1.8;opacity:.82}
+  .link.secondary{stroke:#c7ced9;stroke-width:.9;opacity:.32;stroke-dasharray:4 6}
+  .link.dim{opacity:.055}
+  .node{cursor:pointer}
+  .node .node-dot{stroke:#fff;stroke-width:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.13));transition:transform .18s,stroke .18s,stroke-width .18s,filter .18s}
+  .node text{fill:#273754;font-size:12.2px;font-weight:650;transition:opacity .18s,fill .18s,font-weight .18s}
+  .node:hover .node-dot,.node:focus-visible .node-dot{transform:scale(1.07);transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 3px 5px rgba(0,0,0,.18))}
+  .node:hover text,.node:focus-visible text{fill:#14213d;font-weight:750}
+  .node.dim{opacity:.18}
+  .node.active .node-dot{stroke:#173b8f;stroke-width:2.5;transform:scale(1.12);transform-box:fill-box;transform-origin:center}
+  .node.connected .node-dot{stroke:#173b8f;stroke-width:2}
+  .node.secondary-connected .node-dot{stroke:#c7ced9;stroke-width:1;filter:none}
+  .pulse-ring{fill:none;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center;pointer-events:none;animation:nodePulse 2.8s ease-out infinite}
+  .node:nth-child(3n+2) .pulse-ring{animation-delay:.35s}
+  .node:nth-child(3n) .pulse-ring{animation-delay:.7s}
+  #wheel.has-selection .pulse-ring{animation:none;opacity:0}
+  .group-arc{fill:none;stroke-width:15;opacity:.13}
+  .center{filter:drop-shadow(0 4px 8px rgba(17,45,105,.25));transform-box:fill-box;transform-origin:center;animation:centerBreathe 4.5s ease-in-out infinite}
+  .center-label{fill:#fff;font-weight:800;text-anchor:middle;font-size:14px}
+  @keyframes nodePulse{
+    0%{opacity:.42;transform:scale(.86)}
+    65%,100%{opacity:0;transform:scale(1.55)}
+  }
+  @keyframes centerBreathe{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.025)}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .pulse-ring,.center{animation:none}
+    .pulse-ring{opacity:.22}
+  }
+
+  .modebar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 auto 18px}
+  .mode-btn{background:#fff;color:#173b8f;border:1.5px solid #cfd9ea;padding:10px 14px}
+  .mode-btn.active{background:#173b8f;color:#fff;border-color:#173b8f}
+  .quiz-box{display:none;border:1px solid #dbe4f0;background:#f8faff;border-radius:14px;padding:14px}
+  .quiz-box.visible{display:block}
+  .quiz-box h3{margin:0 0 8px;font-size:18px}
+  .quiz-box p{margin:0 0 10px}
+  .quiz-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .quiz-actions button{flex:1;min-width:120px}
+  .secondary-btn{background:#fff;color:#173b8f;border:1.5px solid #173b8f}
+  .score{font-size:13px;font-weight:700;color:#52627d}
+  .feedback{margin-top:10px!important;padding:10px 12px;border-radius:10px;font-weight:700}
+  .feedback.good{background:#eaf7ee;color:#23633a}
+  .feedback.bad{background:#fff0f0;color:#9a2f2f}
+  .node.quiz-source .node-dot{stroke:#173b8f;stroke-width:3;transform:scale(1.16);transform-box:fill-box;transform-origin:center}
+  .node.quiz-choice .node-dot{stroke:#173b8f;stroke-width:2.2;transform:scale(1.1);transform-box:fill-box;transform-origin:center}
+  .node.quiz-correct .node-dot{stroke:#27824a;stroke-width:3;filter:drop-shadow(0 0 4px rgba(39,130,74,.35))}
+  .node.quiz-wrong .node-dot{stroke:#c43b3b;stroke-width:3}
+  .link.quiz-correct-link{stroke:#173b8f;stroke-width:1.8;opacity:.88;stroke-dasharray:none}
+  .meaning-prompt{font-size:16px;line-height:1.55;color:#33415c;background:#fff;border-left:5px solid #173b8f;border-radius:12px;padding:14px}
+  @media(max-width:860px){
+    .layout{grid-template-columns:1fr}
+    .wheel-card{min-height:620px}
+    #wheel{min-height:620px}
+  }
+  @media(max-width:520px){
+    .page{padding:18px 8px 28px}
+    .card{border-radius:18px}
+    .wheel-card,#wheel{min-height:560px}
+    .panel{padding:17px}
+    .node text{font-size:10.7px}
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>EQ-i 2.0 — interactief wiel</h1>
+  <p class="intro">Kies Verkennen voor uitleg en relaties, of oefen met één van de twee quizmodi.</p>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--zp)"></i>Zelfperceptie</span>
+    <span><i class="dot" style="background:var(--ze)"></i>Zelfexpressie</span>
+    <span><i class="dot" style="background:var(--ip)"></i>Interpersoonlijk</span>
+    <span><i class="dot" style="background:var(--bv)"></i>Besluitvorming</span>
+    <span><i class="dot" style="background:var(--sm)"></i>Stressmanagement</span>
+  </div>
+
+  <nav class="modebar" aria-label="Kies een werkvorm">
+    <button class="mode-btn active" data-mode="explore" type="button">Verkennen</button>
+    <button class="mode-btn" data-mode="relationsQuiz" type="button">Quiz 1-op-3</button>
+    <button class="mode-btn" data-mode="meaningQuiz" type="button">Quiz betekenis</button>
+  </nav>
+
+  <section class="layout">
+    <div class="card wheel-card">
+      <svg id="wheel" viewBox="0 0 820 720" role="img" aria-label="Interactief EQ-i 2.0 wiel met vijftien subschalen"></svg>
+    </div>
+
+    <aside class="card panel">
+      <h2>Geselecteerde subschaal</h2>
+      <div class="selected" id="selection">
+        <strong>Kies een subschaal</strong>
+        <span>De bijbehorende 1-op-3-verbindingen verschijnen hieronder. Klik op een verbinding om de betekenis te openen.</span>
+      </div>
+      <section class="quiz-box" id="quizBox" aria-live="polite"></section>
+      <div class="connections" id="connections"></div>
+      <button class="relationship-toggle" id="relationshipToggle" type="button" aria-pressed="false">Toon alle verbindingen met deze subschaal</button>
+      <button id="reset" type="button">Reset wiel</button>
+      <p class="tip">Op desktop werkt aanwijzen met de muis ook. Op mobiel blijft een selectie actief na aantikken.</p>
+    </aside>
+  </section>
+
+  <p class="copyright">Gebaseerd op het EQ-i 2.0-model en de aangeleverde 1-op-3-verbindingen. Controleer gebruik en publicatie aan de hand van de geldende MHS-licentievoorwaarden.</p>
+</main>
+
+<script>
+const groups = {
+  "Zelfperceptie": {color:"#bd3d3a"},
+  "Zelfexpressie": {color:"#bd6a31"},
+  "Interpersoonlijk": {color:"#aa9635"},
+  "Besluitvorming": {color:"#547b34"},
+  "Stressmanagement": {color:"#3d708d"}
+};
+
+const nodes = [
+  {id:"Zelfbeeld", group:"Zelfperceptie"},
+  {id:"Zelfactualisatie", group:"Zelfperceptie"},
+  {id:"Emotioneel Zelfbewustzijn", group:"Zelfperceptie"},
+
+  {id:"Emotionele Expressie", group:"Zelfexpressie"},
+  {id:"Assertiviteit", group:"Zelfexpressie"},
+  {id:"Onafhankelijkheid", group:"Zelfexpressie"},
+
+  {id:"Interpersoonlijke Relaties", group:"Interpersoonlijk"},
+  {id:"Empathie", group:"Interpersoonlijk"},
+  {id:"Sociale Verantwoordelijkheid", group:"Interpersoonlijk"},
+
+  {id:"Probleemoplossen", group:"Besluitvorming"},
+  {id:"Realiteitstoetsing", group:"Besluitvorming"},
+  {id:"Impulscontrole", group:"Besluitvorming"},
+
+  {id:"Flexibiliteit", group:"Stressmanagement"},
+  {id:"Stresstolerantie", group:"Stressmanagement"},
+  {id:"Optimisme", group:"Stressmanagement"}
+];
+
+const oneToThree = {
+  "Zelfbeeld":["Zelfactualisatie","Probleemoplossen","Realiteitstoetsing"],
+  "Emotioneel Zelfbewustzijn":["Realiteitstoetsing","Emotionele Expressie","Stresstolerantie"],
+  "Zelfactualisatie":["Zelfbeeld","Optimisme","Realiteitstoetsing"],
+  "Emotionele Expressie":["Interpersoonlijke Relaties","Assertiviteit","Empathie"],
+  "Assertiviteit":["Interpersoonlijke Relaties","Emotioneel Zelfbewustzijn","Empathie"],
+  "Onafhankelijkheid":["Probleemoplossen","Emotioneel Zelfbewustzijn","Interpersoonlijke Relaties"],
+  "Interpersoonlijke Relaties":["Zelfactualisatie","Probleemoplossen","Onafhankelijkheid"],
+  "Empathie":["Emotioneel Zelfbewustzijn","Realiteitstoetsing","Emotionele Expressie"],
+  "Sociale Verantwoordelijkheid":["Zelfactualisatie","Interpersoonlijke Relaties","Empathie"],
+  "Probleemoplossen":["Flexibiliteit","Realiteitstoetsing","Emotioneel Zelfbewustzijn"],
+  "Realiteitstoetsing":["Emotioneel Zelfbewustzijn","Zelfbeeld","Probleemoplossen"],
+  "Impulscontrole":["Flexibiliteit","Stresstolerantie","Assertiviteit"],
+  "Flexibiliteit":["Probleemoplossen","Onafhankelijkheid","Impulscontrole"],
+  "Stresstolerantie":["Probleemoplossen","Flexibiliteit","Interpersoonlijke Relaties"],
+  "Optimisme":["Zelfbeeld","Interpersoonlijke Relaties","Realiteitstoetsing"]
+};
+
+const meanings = {
+  "Zelfbeeld":"Jezelf respecteren, begrijpen en accepteren, met oog voor zowel je sterke als je zwakke punten. Zelfbeeld hangt vaak samen met innerlijke kracht en zelfvertrouwen.",
+  "Zelfactualisatie":"De wil om jezelf voortdurend te verbeteren en bezig te zijn met persoonlijk relevante en betekenisvolle doelen die leiden tot een rijk en prettig leven.",
+  "Emotioneel Zelfbewustzijn":"Je eigen emoties herkennen en begrijpen, subtiele verschillen kunnen onderscheiden en doorzien welke invloed emoties hebben op je gedachten en handelen en op anderen.",
+  "Emotionele Expressie":"Gevoelens openlijk uiten, zowel verbaal als non-verbaal.",
+  "Assertiviteit":"Gevoelens, overtuigingen en gedachten openlijk uiten en opkomen voor persoonlijke rechten en waarden op een sociaal acceptabele, niet-offensieve en niet-destructieve manier.",
+  "Onafhankelijkheid":"Jezelf richting geven en vrij zijn van emotionele afhankelijkheid van anderen. Besluitvorming, planning en dagelijkse taken krijgen autonoom vorm.",
+  "Interpersoonlijke Relaties":"Wederzijds bevredigende relaties ontwikkelen en onderhouden die gekenmerkt worden door vertrouwen en compassie.",
+  "Empathie":"Herkennen, begrijpen en waarderen hoe anderen zich voelen, en dat begrip uiten op een manier die respect toont voor hun gevoelens.",
+  "Sociale Verantwoordelijkheid":"Bewust bijdragen aan de maatschappij, groepen en het welzijn van anderen, met verantwoordelijk handelen, sociaal bewustzijn en betrokkenheid bij het grotere geheel.",
+  "Probleemoplossen":"Oplossingen vinden in situaties waarin emoties een rol spelen, en begrijpen hoe emoties de besluitvorming beïnvloeden.",
+  "Realiteitstoetsing":"Objectief blijven door dingen te zien zoals ze werkelijk zijn en herkennen wanneer emoties of vooringenomenheid iemand minder objectief maken.",
+  "Impulscontrole":"Een impuls, neiging of verleiding om te handelen kunnen weerstaan of uitstellen en overhaast gedrag en besluitvorming vermijden.",
+  "Flexibiliteit":"Emoties, gedachten en gedrag aanpassen aan onbekende, onvoorspelbare en dynamische omstandigheden of ideeën.",
+  "Stresstolerantie":"Met stressvolle of moeilijke situaties en gevoelens omgaan en deze op een positieve manier managen of beïnvloeden.",
+  "Optimisme":"Een positieve houding en kijk op het leven behouden en hoopvol en weerbaar blijven, ondanks incidentele tegenslagen."
+};
+
+const svg = document.getElementById("wheel");
+const NS = "http://www.w3.org/2000/svg";
+const cx = 410, cy = 355, radius = 252;
+let selected = null;
+let showAllRelations = false;
+let mode = "explore";
+let quizSource = null;
+let quizChoices = new Set();
+let quizAnswered = false;
+let meaningTarget = null;
+let meaningAnswered = false;
+let quizScore = {relationsCorrect:0,relationsTotal:0,meaningCorrect:0,meaningTotal:0};
+
+function el(name, attrs={}){
+  const e=document.createElementNS(NS,name);
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  return e;
+}
+
+// place grouped nodes around full circle, starting at top
+nodes.forEach((n,i)=>{
+  const a = -Math.PI/2 + i*(Math.PI*2/nodes.length);
+  n.angle=a;
+  n.x=cx + radius*Math.cos(a);
+  n.y=cy + radius*Math.sin(a);
+});
+
+// subtle group arcs
+Object.keys(groups).forEach((g,gi)=>{
+  const start=-Math.PI/2 + (gi*3-.42)*(Math.PI*2/nodes.length);
+  const end=-Math.PI/2 + (gi*3+2.42)*(Math.PI*2/nodes.length);
+  const r=294;
+  const x1=cx+r*Math.cos(start), y1=cy+r*Math.sin(start);
+  const x2=cx+r*Math.cos(end), y2=cy+r*Math.sin(end);
+  const large=(end-start)>Math.PI?1:0;
+  const p=el("path",{d:`M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`,
+    class:"group-arc",stroke:groups[g].color});
+  svg.appendChild(p);
+});
+
+// unique visual links
+const seen=new Set(), links=[];
+Object.entries(oneToThree).forEach(([source,targets])=>{
+  targets.forEach(target=>{
+    const key=[source,target].sort().join("|||");
+    if(!seen.has(key)){ seen.add(key); links.push({source,target,key}); }
+  });
+});
+const nodeMap=Object.fromEntries(nodes.map(n=>[n.id,n]));
+const linkLayer=el("g",{id:"links"});
+links.forEach(l=>{
+  const s=nodeMap[l.source], t=nodeMap[l.target];
+  const line=el("line",{x1:s.x,y1:s.y,x2:t.x,y2:t.y,class:"link","data-source":l.source,"data-target":l.target});
+  l.element=line; linkLayer.appendChild(line);
+});
+svg.appendChild(linkLayer);
+
+// center
+const centerG=el("g",{class:"center"});
+centerG.appendChild(el("circle",{cx,cy,r:58,fill:"#173b8f",class:"center-core"}));
+const ct=el("text",{x:cx,y:cy-7,class:"center-label"});
+["Emotionele","intelligentie"].forEach((txt,i)=>{
+  const sp=el("tspan",{x:cx,dy:i===0?0:18}); sp.textContent=txt; ct.appendChild(sp);
+});
+centerG.appendChild(ct); svg.appendChild(centerG);
+
+// nodes and labels
+const nodeLayer=el("g",{id:"nodes"});
+nodes.forEach(n=>{
+  const g=el("g",{class:"node",tabindex:"0",role:"button","aria-label":n.id,"data-id":n.id,transform:`translate(${n.x} ${n.y})`});
+  g.appendChild(el("circle",{r:18,class:"pulse-ring",stroke:groups[n.group].color}));
+  g.appendChild(el("circle",{r:13,fill:groups[n.group].color,class:"node-dot"}));
+  const outwardX=Math.cos(n.angle), outwardY=Math.sin(n.angle);
+  const specialLabelDistance={"Sociale Verantwoordelijkheid":40};
+  const labelDistance=specialLabelDistance[n.id] || 31;
+  const tx=outwardX*labelDistance, ty=outwardY*labelDistance;
+  const anchor=outwardX>.25?"start":outwardX<-.25?"end":"middle";
+  const text=el("text",{x:tx,y:ty,"text-anchor":anchor,"dominant-baseline":"middle"});
+  const fixedLineBreaks={
+    "Emotioneel Zelfbewustzijn":["Emotioneel","Zelfbewustzijn"],
+    "Interpersoonlijke Relaties":["Interpersoonlijke","Relaties"],
+    "Sociale Verantwoordelijkheid":["Sociale","Verantwoordelijkheid"]
+  };
+  const parts=fixedLineBreaks[n.id];
+  if(parts){
+    parts.forEach((part,i)=>{
+      const tsp=el("tspan",{x:tx,dy:i===0?-6:14}); tsp.textContent=part; text.appendChild(tsp);
+    });
+  } else if(n.id.length>22){
+    const words=n.id.split(" ");
+    const mid=Math.ceil(words.length/2);
+    [words.slice(0,mid).join(" "),words.slice(mid).join(" ")].forEach((part,i)=>{
+      const tsp=el("tspan",{x:tx,dy:i===0?-6:14}); tsp.textContent=part; text.appendChild(tsp);
+    });
+  } else text.textContent=n.id;
+  g.appendChild(text);
+
+  g.addEventListener("mouseenter",()=>{ if(mode==="explore" && !selected) highlight(n.id,false); });
+  g.addEventListener("mouseleave",()=>{ if(mode==="explore" && !selected) clearHighlight(); });
+  g.addEventListener("click",()=>handleNodeClick(n.id));
+  g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();handleNodeClick(n.id)}});
+  n.element=g; nodeLayer.appendChild(g);
+});
+svg.appendChild(nodeLayer);
+
+
+function randomNode(exclude=null){
+  const pool=nodes.map(n=>n.id).filter(id=>id!==exclude);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function clearQuizClasses(){
+  nodes.forEach(n=>n.element.classList.remove("quiz-source","quiz-choice","quiz-correct","quiz-wrong","dim","active","connected","secondary-connected"));
+  links.forEach(l=>l.element.classList.remove("quiz-correct-link","active","secondary","dim"));
+}
+function handleNodeClick(id){
+  if(mode==="explore") return selectNode(id);
+  if(mode==="relationsQuiz") return chooseRelationAnswer(id);
+  if(mode==="meaningQuiz") return chooseMeaningAnswer(id);
+}
+function setMode(nextMode){
+  mode=nextMode;
+  selected=null; showAllRelations=false; quizAnswered=false; meaningAnswered=false;
+  svg.classList.toggle("has-selection",mode!=="explore");
+  clearHighlight(); clearQuizClasses();
+  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));
+  document.getElementById("relationshipToggle").classList.remove("visible");
+  document.getElementById("connections").innerHTML="";
+  const quizBox=document.getElementById("quizBox");
+  quizBox.classList.toggle("visible",mode!=="explore");
+  document.getElementById("reset").textContent=mode==="explore"?"Reset wiel":"Nieuwe vraag";
+  if(mode==="explore") resetInfo();
+  if(mode==="relationsQuiz") startRelationsQuiz();
+  if(mode==="meaningQuiz") startMeaningQuiz();
+}
+function startRelationsQuiz(){
+  quizSource=randomNode(); quizChoices=new Set(); quizAnswered=false;
+  clearQuizClasses();
+  nodeMap[quizSource].element.classList.add("quiz-source");
+  nodes.forEach(n=>n.element.classList.toggle("dim",n.id===quizSource?false:false));
+  const box=document.getElementById("selection");
+  const qn=nodeMap[quizSource];
+  box.style.borderLeftColor=groups[qn.group].color;
+  box.innerHTML=`<strong>${quizSource}</strong><span class="group-name" style="color:${groups[qn.group].color}">${qn.group}</span><span class="meaning">Klik in het wiel op de drie subschalen die bij de 1-op-3 van ${quizSource} horen.</span>`;
+  renderRelationsQuiz();
+}
+function renderRelationsQuiz(feedback="",good=false){
+  const box=document.getElementById("quizBox");
+  box.innerHTML=`<h3>Maak de 1-op-3</h3><p>Kies precies drie subschalen. Gekozen: <strong>${quizChoices.size}/3</strong></p><div class="score">Score: ${quizScore.relationsCorrect} van ${quizScore.relationsTotal}</div>${feedback?`<p class="feedback ${good?'good':'bad'}">${feedback}</p>`:""}<div class="quiz-actions"><button id="checkRelations" type="button" ${quizChoices.size!==3||quizAnswered?'disabled':''}>Controleer</button><button id="nextRelations" class="secondary-btn" type="button">Nieuwe vraag</button></div>`;
+  document.getElementById("checkRelations")?.addEventListener("click",checkRelationsAnswer);
+  document.getElementById("nextRelations")?.addEventListener("click",startRelationsQuiz);
+}
+function chooseRelationAnswer(id){
+  if(quizAnswered || id===quizSource) return;
+  if(quizChoices.has(id)) quizChoices.delete(id); else if(quizChoices.size<3) quizChoices.add(id);
+  nodes.forEach(n=>n.element.classList.toggle("quiz-choice",quizChoices.has(n.id)));
+  renderRelationsQuiz();
+}
+function checkRelationsAnswer(){
+  if(quizChoices.size!==3 || quizAnswered) return;
+  quizAnswered=true; quizScore.relationsTotal++;
+  const correct=new Set(oneToThree[quizSource]);
+  const isCorrect=[...quizChoices].every(x=>correct.has(x));
+  if(isCorrect) quizScore.relationsCorrect++;
+  nodes.forEach(n=>{
+    n.element.classList.remove("quiz-choice","dim");
+    if(correct.has(n.id)) n.element.classList.add("quiz-correct");
+    else if(quizChoices.has(n.id)) n.element.classList.add("quiz-wrong");
+  });
+  links.forEach(l=>{
+    const other=l.source===quizSource?l.target:l.target===quizSource?l.source:null;
+    if(other && correct.has(other)) l.element.classList.add("quiz-correct-link");
+    else l.element.classList.add("dim");
+  });
+  const correctText=oneToThree[quizSource].join(", ");
+  renderRelationsQuiz(isCorrect?"Goed! Je hebt alle drie verbindingen gevonden.":`Nog niet helemaal. De juiste verbindingen zijn: ${correctText}.`,isCorrect);
+}
+function startMeaningQuiz(){
+  meaningTarget=randomNode(); meaningAnswered=false; clearQuizClasses();
+  const target=nodeMap[meaningTarget];
+  const box=document.getElementById("selection");
+  box.style.borderLeftColor=groups[target.group].color;
+  box.innerHTML=`<strong>Welke subschaal hoort hierbij?</strong><span class="meaning">Klik op de passende subschaal in het wiel.</span>`;
+  renderMeaningQuiz();
+}
+function renderMeaningQuiz(feedback="",good=false){
+  const box=document.getElementById("quizBox");
+  box.innerHTML=`<h3>Match de betekenis</h3><div class="meaning-prompt">${meanings[meaningTarget]}</div><div class="score" style="margin-top:10px">Score: ${quizScore.meaningCorrect} van ${quizScore.meaningTotal}</div>${feedback?`<p class="feedback ${good?'good':'bad'}">${feedback}</p>`:""}<div class="quiz-actions"><button id="nextMeaning" class="secondary-btn" type="button">Nieuwe betekenis</button></div>`;
+  document.getElementById("nextMeaning")?.addEventListener("click",startMeaningQuiz);
+}
+function chooseMeaningAnswer(id){
+  if(meaningAnswered) return;
+  meaningAnswered=true; quizScore.meaningTotal++;
+  const good=id===meaningTarget;
+  if(good) quizScore.meaningCorrect++;
+  nodeMap[meaningTarget].element.classList.add("quiz-correct");
+  if(!good) nodeMap[id].element.classList.add("quiz-wrong");
+  nodes.forEach(n=>{if(n.id!==meaningTarget && n.id!==id)n.element.classList.add("dim")});
+  renderMeaningQuiz(good?`Goed: dit is ${meaningTarget}.`:`Je koos ${id}. Het juiste antwoord is ${meaningTarget}.`,good);
+}
+
+function incomingIds(id){
+  return Object.keys(oneToThree).filter(source=>oneToThree[source].includes(id));
+}
+function directIds(id){ return new Set([id,...oneToThree[id]]); }
+function allRelatedIds(id){ return new Set([id,...oneToThree[id],...incomingIds(id)]); }
+
+function highlight(id, updatePanel=true){
+  const ownConnections=new Set(oneToThree[id]);
+  const incomingConnections=new Set(incomingIds(id).filter(x=>!ownConnections.has(x)));
+  const related=showAllRelations ? allRelatedIds(id) : directIds(id);
+
+  nodes.forEach(n=>{
+    const isOwn=n.id!==id && ownConnections.has(n.id);
+    const isAdditional=showAllRelations && n.id!==id && incomingConnections.has(n.id);
+    n.element.classList.toggle("active",n.id===id);
+    n.element.classList.toggle("connected",isOwn);
+    n.element.classList.toggle("secondary-connected",isAdditional);
+    n.element.classList.toggle("dim",!related.has(n.id));
+  });
+
+  links.forEach(l=>{
+    const other=l.source===id ? l.target : l.target===id ? l.source : null;
+    const touchesSelected=other!==null;
+    const isOwn=touchesSelected && ownConnections.has(other);
+    const isAdditional=showAllRelations && touchesSelected && !isOwn;
+
+    l.element.classList.toggle("active",isOwn);
+    l.element.classList.toggle("secondary",isAdditional);
+    l.element.classList.toggle("dim",!(isOwn || isAdditional));
+  });
+  if(updatePanel) updateInfo(id);
+}
+function clearHighlight(){
+  nodes.forEach(n=>n.element.classList.remove("active","connected","secondary-connected","dim"));
+  links.forEach(l=>l.element.classList.remove("active","secondary","dim"));
+}
+function selectNode(id){
+  if(selected===id){
+    selected=null;
+    showAllRelations=false;
+    svg.classList.remove("has-selection");
+    clearHighlight();
+    resetInfo();
+    return;
+  }
+  selected=id;
+  showAllRelations=false;
+  svg.classList.add("has-selection");
+  highlight(id,true);
+}
+function connectionCard(x, note="", isAdditional=false){
+  const connectedNode=nodeMap[x];
+  const color=isAdditional ? "#9aa6b8" : groups[connectedNode.group].color;
+  const groupColor=groups[connectedNode.group].color;
+  return `<details class="connection-card" style="border-left-color:${color}">
+    <summary>
+      <strong>${x}</strong>
+      <span class="group-name" style="color:${groupColor}">${connectedNode.group}</span>
+      ${note ? `<span class="relation-note">${note}</span>` : ""}
+    </summary>
+    <div class="connection-content">
+      <span class="meaning">${meanings[x]}</span>
+    </div>
+  </details>`;
+}
+function updateInfo(id){
+  const n=nodeMap[id];
+  const box=document.getElementById("selection");
+  box.style.borderLeftColor=groups[n.group].color;
+  box.innerHTML=`<strong>${id}</strong><span class="group-name" style="color:${groups[n.group].color}">${n.group}</span><span class="meaning">${meanings[id]}</span>`;
+
+  const ownCards=oneToThree[id].map(x=>connectionCard(x,"1-op-3-verbinding vanuit de geselecteerde subschaal"));
+  let extraCards=[];
+  if(showAllRelations){
+    const incomingOnly=incomingIds(id).filter(x=>!oneToThree[id].includes(x));
+    if(incomingOnly.length){
+      extraCards=[`<h3 class="extra-heading">Aanvullende verbindingen met ${id}</h3>`,
+        ...incomingOnly.map(x=>connectionCard(x,`${id} is één van de drie verbindingen van deze subschaal`,true))];
+    } else {
+      extraCards=[`<p class="relation-note">Er zijn geen aanvullende omgekeerde verbindingen naast de drie verbindingen hierboven.</p>`];
+    }
+  }
+  document.getElementById("connections").innerHTML=[...ownCards,...extraCards].join("");
+
+  const toggle=document.getElementById("relationshipToggle");
+  toggle.classList.add("visible");
+  toggle.setAttribute("aria-pressed",String(showAllRelations));
+  toggle.textContent=showAllRelations ? "Toon alleen de 1-op-3-verbindingen" : "Toon alle verbindingen met deze subschaal";
+}
+function resetInfo(){
+  const box=document.getElementById("selection");
+  box.style.borderLeftColor="#173b8f";
+  box.innerHTML="<strong>Kies een subschaal</strong><span>De bijbehorende 1-op-3-verbindingen verschijnen hieronder. Klik op een verbinding om de betekenis te openen.</span>";
+  document.getElementById("connections").innerHTML="";
+  const toggle=document.getElementById("relationshipToggle");
+  toggle.classList.remove("visible");
+  toggle.setAttribute("aria-pressed","false");
+}
+document.getElementById("relationshipToggle").addEventListener("click",()=>{
+  if(!selected) return;
+  showAllRelations=!showAllRelations;
+  highlight(selected,true);
+});
+document.querySelectorAll(".mode-btn").forEach(btn=>btn.addEventListener("click",()=>setMode(btn.dataset.mode)));
+document.getElementById("reset").addEventListener("click",()=>{
+  if(mode==="relationsQuiz") return startRelationsQuiz();
+  if(mode==="meaningQuiz") return startMeaningQuiz();
+  selected=null;
+  showAllRelations=false;
+  svg.classList.remove("has-selection");
+  clearHighlight();
+  resetInfo();
+});
+</script>
+</body>
+</html>

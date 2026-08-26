@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Interactief EQ-i 2.0 wiel — Nederlands</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#14213d;
+    --muted:#66758f;
+    --line:#dbe3ef;
+    --center:#173b8f;
+    --rim:#dbe7f6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,#f9fbff 0%,var(--bg) 100%);
+  }
+  .page{max-width:1560px;margin:auto;padding:26px clamp(16px,3vw,40px) 48px}
+  h1{margin:0;text-align:center;font-size:clamp(26px,4.4vw,44px);line-height:1.08}
+  .intro{max-width:820px;margin:12px auto 18px;text-align:center;color:var(--muted);font-size:clamp(15px,2.1vw,18px);line-height:1.5}
+
+  .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 auto 20px;padding:0;list-style:none}
+  .legend button{
+    display:inline-flex;align-items:center;gap:8px;
+    background:#fff;border:1.5px solid var(--line);border-radius:999px;
+    padding:7px 14px;font-size:13.5px;font-weight:600;color:#34425d;cursor:pointer;
+    transition:border-color .18s,box-shadow .18s,transform .18s;
+  }
+  .legend button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(23,59,143,.12)}
+  .legend button[aria-pressed="true"]{border-color:currentColor;box-shadow:0 0 0 3px rgba(23,59,143,.08)}
+  .dot{width:12px;height:12px;border-radius:50%;flex:none}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,0.95fr);gap:clamp(16px,2.4vw,34px);align-items:stretch}
+  .card{background:var(--card);border:1px solid #dbe4f0;border-radius:24px;box-shadow:0 12px 40px rgba(36,59,93,.09)}
+  .wheel-card{padding:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  #wheel{width:100%;max-width:760px;height:auto;display:block;margin:0 auto;touch-action:manipulation}
+
+  .panel{padding:clamp(20px,2vw,32px);display:flex;flex-direction:column;gap:16px}
+  .voet{margin-top:auto;display:flex;flex-direction:column;gap:12px;padding-top:8px}
+  .panel h2{font-size:15px;margin:0;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .selected{border-left:5px solid var(--center);background:#f5f8ff;padding:16px;border-radius:14px}
+  .selected .naam{display:block;font-size:clamp(21px,2vw,28px);font-weight:800;line-height:1.2}
+  .selected .groep{display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 12px}
+  .selected .uitleg{display:block;color:#33415c;line-height:1.6;font-size:clamp(15px,1.15vw,17px)}
+  .block{border:1px solid var(--line);border-radius:14px;padding:14px}
+  .block .kop{display:block;font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .block p{margin:0;line-height:1.55;color:#33415c;font-size:14.5px}
+
+  .subschalen .kop{display:block;font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  .subschalen ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+  .subschalen li{
+    background:#fff;border:1px solid var(--line);border-left:4px solid var(--line);
+    border-radius:11px;padding:10px 12px;font-size:14.5px;color:#28364f;
+  }
+  .noot{margin:11px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+
+  button.plain{
+    background:#fff;color:var(--center);border:1.5px solid var(--center);
+    border-radius:12px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer;
+  }
+  button.plain:hover{background:var(--center);color:#fff}
+  .tip{font-size:12.5px;color:var(--muted);margin:0;line-height:1.5}
+
+  /* ---- SVG ---- */
+  .seg{cursor:pointer}
+  .seg .vlak{stroke:#fff;stroke-width:1.4;transition:opacity .2s,filter .2s}
+  .seg text{pointer-events:none;transition:opacity .2s}
+  .seg:hover .vlak,.seg:focus-visible .vlak{filter:brightness(1.08)}
+  .seg:focus-visible{outline:none}
+  .seg:focus-visible .vlak{stroke:var(--center);stroke-width:3}
+  .seg.dim{opacity:.22}
+  .seg.actief .vlak{stroke:var(--center);stroke-width:3.2}
+  .kernlabel{fill:#fff;font-weight:800;text-anchor:middle}
+  .rimtext{fill:#1c4a91;font-weight:700;letter-spacing:.14em;text-anchor:middle}
+  .wbtext{fill:#42597c;font-weight:700;letter-spacing:.11em;text-anchor:middle}
+  #wheel .hart{cursor:pointer}
+  .hart .vlak{stroke:#fff;stroke-width:2}
+  .hart.actief .vlak{stroke:#fff;stroke-width:4}
+  .hart:hover .vlak{filter:brightness(1.15)}
+  #segLaag{filter:drop-shadow(0 4px 10px rgba(23,59,143,.16))}
+  #wheel{filter:drop-shadow(0 10px 26px rgba(23,59,143,.13))}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  @media(max-width:820px){
+    .layout{grid-template-columns:1fr}
+    .voet{margin-top:4px}
+  }
+  @media(max-width:520px){
+    .page{padding:18px 10px 30px}
+    .card{border-radius:18px}
+    .panel{padding:17px}
+  }
+  .bron{max-width:900px;margin:26px auto 0;text-align:center;font-size:12px;color:var(--muted);line-height:1.6}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>Het EQ-i 2.0 wiel</h1>
+  <p class="intro">Klik op een van de vijf gekleurde segmenten voor een korte uitleg van die composietschaal en de drie subschalen die eronder vallen. Klik op het hart voor Welbevinden.</p>
+
+  <ul class="legend" id="legend"></ul>
+
+  <section class="layout">
+    <div class="card wheel-card">
+      <svg id="wheel" viewBox="0 0 820 820" role="application" aria-label="Interactief EQ-i 2.0 wiel met vijf composietschalen en vijftien subschalen"></svg>
+    </div>
+
+    <aside class="card panel">
+      <h2>Selectie</h2>
+      <div class="selected" id="selectie"></div>
+      <div id="details"></div>
+      <div class="voet">
+        <button class="plain" id="reset" type="button">Reset wiel</button>
+        <p class="tip">Ook een klik op een subschaalband selecteert de hele composietschaal. Met Tab en Enter werkt het wiel zonder muis; Esc reset.</p>
+      </div>
+    </aside>
+  </section>
+
+  <p class="bron">EQ-i 2.0® en EQ 360® zijn geregistreerde handelsmerken van Multi-Health Systems Inc. (MHS). De teksten in dit wiel zijn eigen Nederlandse formuleringen; controleer publicatie altijd aan de hand van de geldende MHS-licentievoorwaarden.</p>
+</main>
+
+<script>
+/* ============================================================
+   1. DATA
+   ============================================================ */
+const composieten = [
+  {
+    id:"zelfperceptie",
+    naam:"Zelfperceptie",
+    vraag:"Hoe zie ik mezelf?",
+    uitleg:"Zelfperceptie gaat over hoe goed je jezelf kent en waardeert, en of je richting geeft aan je eigen ontwikkeling. Het is het fundament van het model: wie zichzelf niet scherp ziet, kan zich ook moeilijk uiten of anderen goed inschatten.",
+    kleur:"#b23a33", licht:"#dfa9a4", donker:"#7d2723",
+    subs:["Zelfbeeld","Zelfactualisatie","Emotioneel zelfbewustzijn"]
+  },
+  {
+    id:"zelfexpressie",
+    naam:"Zelfexpressie",
+    vraag:"Hoe uit ik mezelf?",
+    uitleg:"Zelfexpressie is zelfperceptie in actie: laten zien en horen wat er in je omgaat, op een manier die anderen begrijpen. Het gaat om openheid, opkomen voor wat je belangrijk vindt en op eigen benen kunnen staan.",
+    kleur:"#b06a2e", licht:"#ddb08a", donker:"#5f3712",
+    subs:["Emotionele expressie","Assertiviteit","Onafhankelijkheid"]
+  },
+  {
+    id:"interpersoonlijk",
+    naam:"Interpersoonlijk",
+    vraag:"Hoe verbind ik me met anderen?",
+    uitleg:"Deze composietschaal gaat over het opbouwen en onderhouden van relaties die rusten op vertrouwen en wederzijds respect, over aanvoelen wat er bij anderen speelt, en over je verbonden voelen met een groter geheel dan jezelf.",
+    kleur:"#a29438", licht:"#d3ca92", donker:"#4c4514",
+    subs:["Interpersoonlijke relaties","Empathie","Sociale verantwoordelijkheid"]
+  },
+  {
+    id:"besluitvorming",
+    naam:"Besluitvorming",
+    vraag:"Hoe beïnvloeden emoties mijn beslissingen?",
+    uitleg:"Emoties zijn informatie. Deze composietschaal gaat over de vraag of je die informatie gebruikt bij het maken van keuzes, zonder je erdoor te laten meeslepen: helder blijven kijken naar wat er werkelijk speelt en niet te snel handelen.",
+    kleur:"#62813c", licht:"#b8cb9f", donker:"#36491f",
+    subs:["Probleemoplossen","Realiteitstoetsing","Impulscontrole"]
+  },
+  {
+    id:"stressmanagement",
+    naam:"Stressmanagement",
+    vraag:"Hoe ga ik om met druk en verandering?",
+    uitleg:"Stressmanagement gaat over veerkracht. Kun je meebewegen als de omstandigheden veranderen, effectief blijven functioneren als de spanning oploopt, en hoopvol blijven na een tegenslag?",
+    kleur:"#3f7189", licht:"#a6c1d0", donker:"#22485c",
+    subs:["Flexibiliteit","Stresstolerantie","Optimisme"]
+  }
+];
+
+const welbevinden = {
+  naam:"Welbevinden",
+  vraag:"Het hart van het model",
+  uitleg:"Welbevinden staat in het hart van het EQ-i 2.0. Het is geen zesde composietschaal, maar een graadmeter van je algehele tevredenheid en levensvreugde. Het zegt iets over hoe de vijf schalen samen uitpakken.",
+  subs:[]
+};
+
+/* ============================================================
+   2. WIEL OPBOUWEN
+   ============================================================ */
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("wheel");
+const CX=410, CY=410;
+
+const R = {
+  hart:84, hartRing:92,
+  subBinnen:94, subBuiten:212,    // ring met de 3 subschaalbanden
+  compBinnen:212, compBuiten:302, // ring met de composietnamen
+  wbBinnen:302, wbBuiten:346,     // witte ring met WELBEVINDEN
+  rimBinnen:346, rimBuiten:396    // lichtblauwe buitenrand
+};
+
+function el(name,attrs={}){
+  const e=document.createElementNS(NS,name);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  return e;
+}
+function polar(r,deg){
+  const a=deg*Math.PI/180;
+  return [CX+r*Math.cos(a), CY+r*Math.sin(a)];
+}
+/* ringsegment tussen twee radii en twee hoeken */
+function sector(r0,r1,a0,a1){
+  const [x0,y0]=polar(r1,a0), [x1,y1]=polar(r1,a1);
+  const [x2,y2]=polar(r0,a1), [x3,y3]=polar(r0,a0);
+  const groot=(a1-a0)>180?1:0;
+  return `M ${x0} ${y0} A ${r1} ${r1} 0 ${groot} 1 ${x1} ${y1} L ${x2} ${y2} A ${r0} ${r0} 0 ${groot} 0 ${x3} ${y3} Z`;
+}
+/* boog voor gebogen tekst; omgekeerd tekenen als het onderin staat */
+function boog(r,a0,a1,omgekeerd){
+  let s=a0,e=a1;
+  if(omgekeerd){ s=a1; e=a0; }
+  const [x0,y0]=polar(r,s), [x1,y1]=polar(r,e);
+  const groot=Math.abs(e-s)>180?1:0;
+  const sweep=e>s?1:0;
+  return `M ${x0} ${y0} A ${r} ${r} 0 ${groot} ${sweep} ${x1} ${y1}`;
+}
+function normaliseer(deg){ let d=deg%360; if(d>=180)d-=360; if(d<-180)d+=360; return d; }
+function moetOmgekeerd(midden){ return normaliseer(midden)>0; }
+
+/* automatisch passende tekstgrootte binnen een boog */
+function pasGrootte(tekst,r,spanGraden,max,min){
+  const beschikbaar=(spanGraden*Math.PI/180)*r*0.90;
+  const nodig=tekst.length*0.53;
+  return Math.max(min,Math.min(max,beschikbaar/nodig));
+}
+
+const defs=el("defs");
+svg.appendChild(defs);
+
+/* kleurhulp: hex mengen met wit of zwart voor de verlopen */
+function meng(hex,doel,t){
+  const p=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+  const [r1,g1,b1]=p(hex), [r2,g2,b2]=p(doel);
+  const m=(a,b)=>Math.round(a+(b-a)*t);
+  return "#"+[m(r1,r2),m(g1,g2),m(b1,b2)].map(v=>v.toString(16).padStart(2,"0")).join("");
+}
+/* radiaal verloop: binnenrand iets dieper, buitenrand iets lichter — geeft de glans van het origineel */
+function verloop(id,r,binnenKleur,buitenKleur,vanaf){
+  const g=el("radialGradient",{id:id,gradientUnits:"userSpaceOnUse",cx:CX,cy:CY,r:r});
+  g.appendChild(el("stop",{offset:vanaf,"stop-color":binnenKleur}));
+  g.appendChild(el("stop",{offset:1,"stop-color":buitenKleur}));
+  defs.appendChild(g);
+  return "url(#"+id+")";
+}
+
+let padId=0;
+function tekstOpBoog(groep,tekst,r,a0,a1,opties){
+  const mid=(a0+a1)/2;
+  const om=moetOmgekeerd(mid);
+  const id="pad"+(padId++);
+  defs.appendChild(el("path",{id:id,d:boog(r,a0,a1,om),fill:"none"}));
+  const t=el("text",Object.assign({
+    "text-anchor":"middle","dominant-baseline":"central"
+  },opties.attrs||{}));
+  const tp=el("textPath",{href:"#"+id,startOffset:"50%"});
+  tp.setAttributeNS("http://www.w3.org/1999/xlink","xlink:href","#"+id);
+  tp.textContent=tekst;
+  t.appendChild(tp);
+  groep.appendChild(t);
+  return t;
+}
+
+/* --- buitenrand: lichtblauwe band met blauwe omlijning --- */
+const rim=el("g",{"aria-hidden":"true"});
+rim.appendChild(el("circle",{cx:CX,cy:CY,r:R.rimBuiten,
+  fill:verloop("gRim",R.rimBuiten,"#e9f1fa","#d3e3f4",R.rimBinnen/R.rimBuiten),
+  stroke:"#7ea6d4","stroke-width":1.8}));
+rim.appendChild(el("circle",{cx:CX,cy:CY,r:R.rimBinnen,fill:"#ffffff",stroke:"#8fb2d9","stroke-width":1.4}));
+svg.appendChild(rim);
+
+const rimLabels=el("g",{"aria-hidden":"true"});
+const rimR=(R.rimBinnen+R.rimBuiten)/2;
+tekstOpBoog(rimLabels,"EMOTIONEEL EN SOCIAAL FUNCTIONEREN",rimR,-144,-36,{attrs:{class:"rimtext","font-size":17}});
+tekstOpBoog(rimLabels,"EMOTIONEEL EN SOCIAAL FUNCTIONEREN",rimR,36,144,{attrs:{class:"rimtext","font-size":17}});
+tekstOpBoog(rimLabels,"HANDELEN",rimR,-26,26,{attrs:{class:"rimtext","font-size":17}});
+tekstOpBoog(rimLabels,"HANDELEN",rimR,154,206,{attrs:{class:"rimtext","font-size":17}});
+svg.appendChild(rimLabels);
+
+/* --- witte welbevinden-ring, sluit direct aan op de segmenten --- */
+const wbRing=el("g",{"aria-hidden":"true"});
+wbRing.appendChild(el("circle",{cx:CX,cy:CY,r:R.wbBuiten,fill:"#ffffff",stroke:"#c3d6ee","stroke-width":1}));
+svg.appendChild(wbRing);
+
+const wbLabels=el("g",{"aria-hidden":"true"});
+const wbR=(R.wbBinnen+R.wbBuiten)/2;
+[-126,-54,18,90,162].forEach(grens=>{
+  tekstOpBoog(wbLabels,"WELBEVINDEN",wbR,grens-15,grens+15,{attrs:{class:"wbtext","font-size":10.5}});
+});
+svg.appendChild(wbLabels);
+
+/* --- segmenten --- */
+const segLaag=el("g",{id:"segLaag"});
+svg.appendChild(segLaag);
+
+const START=-126;          // Zelfperceptie begint linksboven, midden bovenaan
+const SPAN=72;             // 360 / 5
+const PAD=1.3;             // witte marge tussen composieten
+const subBanden=[];        // radiusgrenzen voor de 3 subschaalbanden (buiten -> binnen)
+(function(){
+  const totaal=R.subBuiten-R.subBinnen;
+  const gap=0;             // banden sluiten aan; alleen een dunne witte lijn ertussen
+  const dik=(totaal-2*gap)/3;
+  for(let i=0;i<3;i++){
+    const buiten=R.subBuiten-i*(dik+gap);
+    subBanden.push({buiten:buiten, binnen:buiten-dik, mid:buiten-dik/2});
+  }
+})();
+
+/* label in een subschaalband: één regel, of twee regels als het te klein zou worden */
+function plaatsSubLabel(g,naam,band,a0,a1,kleur){
+  const span=a1-a0;
+  const stijl=fs=>({fill:kleur,"font-weight":700,"font-size":fs});
+  const fs=pasGrootte(naam,band.mid,span,13,8);
+  if(fs>=10.2 || naam.indexOf(" ")===-1){
+    tekstOpBoog(g,naam,band.mid,a0,a1,{attrs:stijl(fs)});
+    return;
+  }
+  const woorden=naam.split(" ");
+  const helft=Math.ceil(woorden.length/2);
+  const regel1=woorden.slice(0,helft).join(" ");
+  const regel2=woorden.slice(helft).join(" ");
+  const om=moetOmgekeerd((a0+a1)/2);
+  const dr=6.5;
+  const rEerste = om ? band.mid-dr : band.mid+dr;   // bovenste regel voor de kijker
+  const rTweede = om ? band.mid+dr : band.mid-dr;
+  const f=Math.min(
+    pasGrootte(regel1,rEerste,span,11.5,8),
+    pasGrootte(regel2,rTweede,span,11.5,8)
+  );
+  tekstOpBoog(g,regel1,rEerste,a0,a1,{attrs:stijl(f)});
+  tekstOpBoog(g,regel2,rTweede,a0,a1,{attrs:stijl(f)});
+}
+
+const alleSegmenten=[];
+
+composieten.forEach((comp,ci)=>{
+  const a0=START+ci*SPAN+PAD;
+  const a1=START+(ci+1)*SPAN-PAD;
+  const mid=(a0+a1)/2;
+  comp.a0=a0; comp.a1=a1; comp.mid=mid;
+
+  /* verlopen: buitenrand lichter, binnenrand dieper */
+  const vulComp=verloop("gc-"+comp.id,R.compBuiten,
+    meng(comp.kleur,"#000000",0.16), meng(comp.kleur,"#ffffff",0.14),
+    R.compBinnen/R.compBuiten);
+  const vulSub=verloop("gs-"+comp.id,R.subBuiten,
+    meng(comp.licht,"#ffffff",0.30), comp.licht,
+    R.subBinnen/R.subBuiten);
+
+  /* composietring: het enige klik- en focuspunt van dit segment */
+  const gc=el("g",{class:"seg",tabindex:"0",role:"button",
+    "aria-label":"Composietschaal "+comp.naam+", met de subschalen "+comp.subs.join(", "),
+    "data-type":"comp","data-id":comp.id});
+  gc.appendChild(el("path",{d:sector(R.compBinnen,R.compBuiten,a0,a1),fill:vulComp,class:"vlak"}));
+  const compR=R.compBinnen+(R.compBuiten-R.compBinnen)*0.54;
+  tekstOpBoog(gc,comp.naam.toUpperCase(),compR,a0,a1,{
+    attrs:{class:"kernlabel","font-size":pasGrootte(comp.naam,compR,SPAN-2*PAD,27,13),"letter-spacing":"1.5"}
+  });
+  segLaag.appendChild(gc);
+  comp.element=gc;
+  alleSegmenten.push(gc);
+
+  /* subschaalbanden: alleen tonen; een klik erop selecteert de composietschaal */
+  comp.subs.forEach((naam,si)=>{
+    const band=subBanden[si];
+    const g=el("g",{class:"seg",role:"presentation","aria-hidden":"true","data-type":"sub","data-comp":comp.id});
+    g.appendChild(el("path",{d:sector(band.binnen,band.buiten,a0,a1),fill:vulSub,class:"vlak"}));
+    plaatsSubLabel(g,naam,band,a0,a1,comp.donker);
+    segLaag.appendChild(g);
+    alleSegmenten.push(g);
+  });
+});
+
+/* --- hart --- */
+const hart=el("g",{class:"seg hart",tabindex:"0",role:"button","aria-label":"Welbevinden, het hart van het model","data-type":"hart","data-id":"welbevinden"});
+hart.appendChild(el("circle",{cx:CX,cy:CY,r:R.hartRing,fill:"#e7eef9",stroke:"#ffffff","stroke-width":1.4}));
+hart.appendChild(el("circle",{cx:CX,cy:CY,r:R.hart,
+  fill:verloop("gHart",R.hart,"#2a55ad","#12327c",0),class:"vlak"}));
+const ht=el("text",{x:CX,y:CY-9,class:"kernlabel","font-size":16});
+["Emotionele","intelligentie"].forEach((w,i)=>{
+  const sp=el("tspan",{x:CX,dy:i===0?0:19}); sp.textContent=w; ht.appendChild(sp);
+});
+hart.appendChild(ht);
+segLaag.appendChild(hart);
+alleSegmenten.push(hart);
+
+/* ============================================================
+   3. INTERACTIE
+   ============================================================ */
+let selectie=null;   // {type,id}
+const selectieBox=document.getElementById("selectie");
+const detailBox=document.getElementById("details");
+
+function wisMarkering(){
+  alleSegmenten.forEach(s=>s.classList.remove("dim","actief"));
+}
+function markeerComp(id){
+  alleSegmenten.forEach(s=>{
+    const type=s.dataset.type;
+    const hoortErbij=(type==="comp" && s.dataset.id===id) ||
+                     (type==="sub"  && s.dataset.comp===id);
+    s.classList.toggle("actief",type==="comp" && s.dataset.id===id);
+    s.classList.toggle("dim",!(hoortErbij||type==="hart"));
+  });
+}
+function markeerHart(){
+  alleSegmenten.forEach(s=>{
+    s.classList.toggle("dim",s.dataset.type==="sub"||s.dataset.type==="comp");
+    s.classList.toggle("actief",s.dataset.type==="hart");
+  });
+}
+
+/* lijst met de drie subschalen; alleen de namen, geen definities */
+function subLijst(comp){
+  const items=comp.subs.map(naam=>
+    `<li style="border-left-color:${comp.kleur}">${naam}</li>`).join("");
+  return `<div class="subschalen"><span class="kop">De drie subschalen</span><ul>${items}</ul>
+    <p class="noot">De betekenis van de losse subschalen komt aan bod in het rapport en de debriefing.</p></div>`;
+}
+
+function toonComp(id){
+  const comp=composieten.find(c=>c.id===id);
+  selectieBox.style.borderLeftColor=comp.kleur;
+  selectieBox.innerHTML=
+    `<span class="naam">${comp.naam}</span>
+     <span class="groep" style="color:${comp.kleur}">Composietschaal · ${comp.vraag}</span>
+     <span class="uitleg">${comp.uitleg}</span>`;
+  detailBox.innerHTML=subLijst(comp);
+}
+function toonHart(){
+  selectieBox.style.borderLeftColor="#173b8f";
+  selectieBox.innerHTML=
+    `<span class="naam">${welbevinden.naam}</span>
+     <span class="groep" style="color:#173b8f">${welbevinden.vraag}</span>
+     <span class="uitleg">${welbevinden.uitleg}</span>`;
+  detailBox.innerHTML="";
+}
+function leegPaneel(){
+  selectieBox.style.borderLeftColor="#173b8f";
+  selectieBox.innerHTML=
+    `<span class="naam">Kies een composietschaal</span>
+     <span class="uitleg">Klik op een van de vijf gekleurde segmenten in het wiel voor een korte uitleg, of op het hart voor Welbevinden.</span>`;
+  detailBox.innerHTML="";
+}
+
+function kies(type,id){
+  if(selectie && selectie.type===type && selectie.id===id){ reset(); return; }
+  selectie={type,id};
+  if(type==="comp"){ markeerComp(id); toonComp(id); }
+  else { markeerHart(); toonHart(); }
+  legendaBij();
+}
+function reset(){
+  selectie=null;
+  wisMarkering();
+  leegPaneel();
+  legendaBij();
+}
+
+/* Klikken op een subschaalband selecteert de hele composietschaal.
+   Alleen de composietring en het hart zijn focusbaar met het toetsenbord. */
+alleSegmenten.forEach(s=>{
+  const type=s.dataset.type;
+  const doelType = type==="hart" ? "hart" : "comp";
+  const doelId   = type==="sub" ? s.dataset.comp : s.dataset.id;
+
+  s.addEventListener("mouseenter",()=>{
+    if(selectie) return;
+    if(doelType==="comp") markeerComp(doelId); else markeerHart();
+  });
+  s.addEventListener("mouseleave",()=>{ if(!selectie) wisMarkering(); });
+  s.addEventListener("click",()=>kies(doelType,doelId));
+  if(s.hasAttribute("tabindex")){
+    s.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); kies(doelType,doelId); }
+    });
+  }
+});
+
+/* legenda */
+const legend=document.getElementById("legend");
+composieten.forEach(c=>{
+  const li=document.createElement("li");
+  const b=document.createElement("button");
+  b.type="button";
+  b.setAttribute("aria-pressed","false");
+  b.dataset.comp=c.id;
+  b.style.color=c.kleur;
+  b.innerHTML=`<i class="dot" style="background:${c.kleur}"></i><span style="color:#34425d">${c.naam}</span>`;
+  b.addEventListener("click",()=>kies("comp",c.id));
+  li.appendChild(b); legend.appendChild(li);
+});
+function legendaBij(){
+  legend.querySelectorAll("button").forEach(b=>{
+    const aan = selectie && selectie.type==="comp" && selectie.id===b.dataset.comp;
+    b.setAttribute("aria-pressed",String(!!aan));
+  });
+}
+
+document.getElementById("reset").addEventListener("click",reset);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") reset(); });
+
+leegPaneel();
+</script>
+</body>
+</html>

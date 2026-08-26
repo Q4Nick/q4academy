@@ -1,0 +1,43 @@
+Maak de "Profiel" knop in het account-dropdown menu (rechtsboven, naast de "AG"-avatar) functioneel, zodat een gebruiker zijn/haar eigen gegevens kan inzien én wijzigen.
+Context van de huidige app:
+
+Leerplatform "Q4 Academy" (DISC-training)
+Navigatiebalk bovenin: Dashboard, Factcards, Voortgang, Admin
+Rechtsboven: taalswitch (NL/EN) en ronde avatar met initialen ("AG")
+Klik op avatar opent dropdown met: naam ("Admin Gebruiker"), e-mail ("admin@q4academy.nl"), en links "Profiel" en "Uitloggen"
+
+Wat ik wil dat je bouwt:
+
+Navigatie: Zorg dat klikken op "Profiel" in de dropdown naar een nieuwe pagina /profiel navigeert.
+Profielpagina – weergave:
+
+Toon bovenaan een grote avatar met initialen
+Toon huidige naam, e-mailadres en rol (bijv. "Admin") van de ingelogde gebruiker
+Houd dezelfde visuele stijl aan als het dashboard (blauw kleurenschema, witte kaarten, afgeronde hoeken, lichte schaduw, zelfde lettertype, navigatiebalk blijft zichtbaar)
+
+
+Profielpagina – bewerken:
+
+Maak de velden naam en e-mailadres bewerkbaar via een invoerformulier (of een "Bewerken"-knop die de velden omzet naar invoervelden)
+Voeg een "Opslaan"-knop toe (in dezelfde blauwe stijl als de "Bekijk opnieuw"-knoppen op het dashboard)
+Voeg een "Annuleren"-knop toe om wijzigingen ongedaan te maken zonder op te slaan
+Valideer invoer: naam mag niet leeg zijn, e-mail moet een geldig formaat hebben
+Toon een duidelijke bevestiging (bijv. groen vinkje of melding "Gegevens opgeslagen") nadat is opgeslagen
+Toon een foutmelding als opslaan mislukt of validatie faalt
+
+
+Data opslaan:
+
+Sla de gewijzigde gegevens op in de bestaande database/state die de app gebruikt voor gebruikersgegevens
+Zorg dat de wijzigingen direct zichtbaar zijn: bijgewerkte naam/initialen moeten ook terugkomen in de avatar en dropdown rechtsboven, zonder dat de gebruiker hoeft uit te loggen
+
+
+Optioneel maar gewenst:
+
+Voeg een wachtwoord-wijzigen sectie toe (huidig wachtwoord, nieuw wachtwoord, bevestig nieuw wachtwoord)
+Toon niet-bewerkbare informatie zoals aanmelddatum of accountstatus
+
+
+Navigatie terug: Voeg een duidelijke terugknop of breadcrumb toe om terug te gaan naar het Dashboard.
+
+Houd de bestaande look-and-feel strikt aan: dezelfde knopstijlen, kleuren, kaartvormgeving en spacing als op het dashboard, zodat de profielpagina naadloos aanvoelt als onderdeel van dezelfde applicatie.
