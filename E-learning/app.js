@@ -926,6 +926,8 @@ function icon(name) {
     lessons: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
     user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+    close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+    arrowleft: '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
   };
   return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[name]}</svg>`;
 }
@@ -1363,27 +1365,29 @@ function lessonView() {
   const isQuizStep = step % 5 === 0;
   return shell(`
     <main class="main">
-      <div class="lesson-shell">
-        <aside class="step-rail">
-          ${Array.from({ length: lesson.steps }, (_, i) => `<button class="step-dot ${i+1<step?"done":""} ${i+1===step?"active":""}" data-step="${i+1}">${i+1}</button>`).join("")}
-        </aside>
+      <div class="lesson-shell lesson-shell-flat">
         <section class="lesson-content">
           <header class="lesson-header">
             <button class="breadcrumb" data-course="${course.id}">Terug naar cursus</button>
             <h1>${lesson.title}</h1>
             <p>${lesson.intro}</p>
-            <div class="meta-row"><span>Stap ${step} van ${lesson.steps}</span><span>Quiz: ${lesson.quiz} correct</span></div>
           </header>
           <div class="lesson-body">${lesson.id === "1-1" ? gedragContent(step) : lesson.id === "1-2" ? les12Content(step) : lesson.id === "1-3" ? les13Content(step) : lesson.id === "2-1" ? les21Content(step) : lesson.id === "2-2" ? les22Content(step) : lesson.id === "2-3" ? les23Content(step) : (isQuizStep ? quizBlock() : contentBlock(step))}</div>
-          <footer class="lesson-footer">
-            <button class="btn ghost" data-course="${course.id}">Afsluiten</button>
-            <div>
-              <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>Vorige</button>
-              <button class="btn" data-next-step>${step===lesson.steps?"Les afronden":"Volgende"} ${icon("arrow")}</button>
-            </div>
-          </footer>
         </section>
       </div>
+      <footer class="lesson-footer lesson-footer-sticky">
+        <div class="lesson-footer-left">
+          <button class="btn ghost" data-course="${course.id}">${icon("close")} Afsluiten</button>
+          <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>${icon("arrowleft")} Vorige</button>
+        </div>
+        <div class="lesson-footer-steps">
+          <div class="step-dots-row">
+            ${Array.from({ length: lesson.steps }, (_, i) => `<button class="step-dot ${i+1<step?"done":""} ${i+1===step?"active":""}" data-step="${i+1}" aria-label="Stap ${i+1}"></button>`).join("")}
+          </div>
+          <div class="step-dots-caption">Stap ${step} van ${lesson.steps} &middot; Quiz: ${lesson.quiz} correct</div>
+        </div>
+        <button class="btn" data-next-step>${step===lesson.steps?"Les afronden":"Volgende"} ${icon("arrow")}</button>
+      </footer>
     </main>`, "dashboard");
 }
 
