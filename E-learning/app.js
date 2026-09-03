@@ -1934,7 +1934,7 @@ function les12Content(step) {
     "Als we beide assen omkaderen krijg je een vierkwadrantengrid met daarin de vier primaire temperamenten van ons DISC-model: Dominant, Interactief, Stabiel en Consciëntieus.",
     "We hebben alle vier de temperamenten in ons, alleen kunnen ze niet allemaal even sterk aanwezig zijn. Afhankelijk van DNA, opvoeding, gewoontes en belangrijke ervaringen zal het ene temperament overheersender zijn dan het andere. Als we zeggen: 'iemand heeft een hoge C', dan betekent dit dat hij meer dan gemiddeld het gedrag laat zien dat hoort bij het C-temperament. Hoe hoger de intensiteit, hoe vaker en hoe sterker dat gedrag (aanwezig) zal zijn. Dit zegt niets over hoe goed iemand ergens in is, maar op welke manier iemand werkt en reageert.",
   ]);
-  if (step === 11) return lsDiscGrid() + lsFactRow(lsQuadTemperaments.map(q => ({ label: q.label + "-Temperament", fact: q.fact, color: q.color })));
+  if (step === 11) return lsQuadrant();
   if (step === 12) return lsMC("Wat meet DISC?", ["Interesses", "Behoeften", "Waarden", "Vaardigheden"], 1);
   if (step === 13) return lsTF("Mensen laten maar één soort gedrag zien: indirect of direct.", false);
   if (step === 14) return lsMC("De tuin moet worden opgeknapt en je wordt geholpen door twee goede vrienden. In je uitnodiging geef je aan dat je het fijn vindt om het samen te doen, rustig aan te pakken en elkaar te helpen. Het hoeft niet allemaal in één keer af, maar je wilt er wel samen stap voor stap aan werken. Waar in de grafiek bevind jij je?",
@@ -1981,7 +1981,7 @@ function les13Content(step) {
   if (step === 8) return lsTextCard("Volgorde van temperamenten", [
     "We hebben alle vier de temperamenten in ons, maar de vraag is: wat is onze persoonlijke volgorde? We willen antwoord op alle vier de vragen om tot actie over te gaan, maar de volgorde is voor iedereen anders. Een ISDC bijvoorbeeld wil eerst weten MET WIE hij gaat samenwerken, dan HOE, dan pas WAT er precies gedaan moet worden en tot slot wil hij weten WAAROM.",
   ]);
-  if (step === 9) return lsDiscGrid() + lsFactRow([{ label: "De waarde in een team", fact: 5, color: "#475569" }]);
+  if (step === 9) return lsQuadrantGeneric(lsQuadTemperamentsWhy, [{ label: "De waarde in een team", fact: 5, color: "#475569" }]);
   if (step === 10) return lsCheck("Welke van onderstaande antwoordopties zegt iets over de verschillende temperamenten?", [
     "Interesses in bepaalde onderwerpen",
     "De manier waarop we naar een situatie kijken",
@@ -2035,7 +2035,7 @@ function les21Content(step) {
     "Vanuit het WILLEN zijn we veel beter in staat ons timemanagement te controleren dan vanuit het MOETEN.",
     "En hoe worden we gedreven? Zijn we meer positief gedreven vanuit een hoge eigenwaarde of zijn we meer negatief gedreven vanuit een lage eigenwaarde en onzekerheid?",
   ]);
-  if (step === 6) return lsDiscGrid();
+  if (step === 6) return lsQuadrantGeneric(lsQuadTemperamentsEsteem, []);
   if (step === 7) return lsTextCard("Vecht vs. vlucht: basisreactie per stijl", [
     "<strong>D-stijl.</strong> De D-stijl gaat de confrontatie aan en direct op het doel af. De D-stijl wil controle hebben en behouden en zal deze bij elke situatie dan ook direct (terug)pakken. We noemen dit: direct vechtgedrag.",
     "<strong>I-stijl.</strong> De grootste angst van de I-stijl is sociale afwijzing en gaat daarom liever geen confrontaties aan. Maakt een geintje, houdt zijn mond of loopt er (letterlijk) van weg. Ook wel direct vluchtgedrag genoemd.",
