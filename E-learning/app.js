@@ -1549,9 +1549,9 @@ function gedragContent(step) {
       <p>Hij ontwikkelde de motivatietheorie en de piramide van Maslow, waarin hij de drijfveren van menselijk gedrag beschrijft. Deze drijfveren zijn gebaseerd op onze behoefte aan veiligheid.</p>
       <p>Als die veiligheid in het gedrang komt dan reageren we daarop. De reactie is angstgedreven. We ervaren die angst als zeer onprettig: ons handelen zal dan eerst in het teken staan van het wegnemen ervan.</p>
       <p>De manier waarop we handelen komt voort uit een aantal vragen die we onszelf dagelijks stellen: Voel ik me goed en veilig? Word ik gewaardeerd en geaccepteerd? Deze vragen stellen we onszelf op verschillende gebieden en behoeftes, zoals aangegeven in de piramide van Maslow. Deze piramide bestaat uit verschillende lagen.</p>
-      <div class="gb-img gb-img-wide"><img src="${gbTrap}" alt="Traptreden van blokken">
+      <div class="gb-img gb-img-wide"><img src="${factImages.maslow_pyramid}" alt="Piramide van Maslow">
         <span class="gb-caption">In de piramide van Maslow worden de drijfveren van menselijk gedrag beschreven. Deze drijfveren zijn de basis van ons gedrag.</span></div>
-      <div class="gb-factchip">${icon("lessons")} <span><strong>Piramide van Maslow</strong><br><small>theorie</small></span></div>
+      <button class="gb-factchip" data-fact-detail="0" style="cursor:pointer;text-align:left;border-color:transparent">${icon("lessons")} <span><strong>Piramide van Maslow</strong><br><small>theorie</small></span></button>
     </div>
   </div>`;
   if (step === 6) return gbTekstKaart("Angst- en doelgedreven lagen", [
