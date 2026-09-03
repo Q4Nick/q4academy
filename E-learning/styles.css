@@ -153,7 +153,8 @@ button, a { -webkit-tap-highlight-color:transparent; }
 .lesson-header { border-bottom:1px solid var(--line); }
 .lesson-header h1 { margin:0 0 10px; font-size:20px; }
 .lesson-body { display:grid; align-content:start; gap:18px; }
-.lesson-footer-sticky { background:#fff; border:1px solid var(--line); border-radius:8px; margin-top:16px; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.lesson-footer-sticky { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:min(1160px,calc(100% - 48px)); z-index:50; background:#fff; border:1px solid var(--line); border-bottom:none; border-radius:8px 8px 0 0; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; gap:16px; box-shadow:0 -6px 18px rgba(23,35,60,.08); }
+.main:has(.lesson-footer-sticky) { padding-bottom:110px; }
 .lesson-footer-left { display:flex; align-items:center; gap:8px; flex:none; }
 .lesson-footer-steps { display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; min-width:0; }
 .step-dots-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center; }
@@ -212,8 +213,9 @@ th { color:var(--muted); font-size:11px; font-weight:700; text-transform:upperca
   .lesson-row { grid-template-columns:1fr; }
   .lesson-header, .lesson-body, .lesson-footer { padding:16px; }
   .lesson-footer { display:grid; }
-  .lesson-footer-sticky { display:flex; flex-direction:column; gap:12px; padding:16px; }
+  .lesson-footer-sticky { width:calc(100% - 24px); flex-direction:column; gap:12px; padding:16px; }
   .lesson-footer-left, .lesson-footer-sticky > .btn { justify-content:center; width:100%; }
+  .main:has(.lesson-footer-sticky) { padding-bottom:190px; }
   .auth-card { padding:22px; }
 }
 
