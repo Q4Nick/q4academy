@@ -1341,8 +1341,8 @@ function lessonView() {
         </div>
         <footer class="eqi-bottombar">
           <div class="ebb-side">
-            <button class="btn ghost" data-course="${course.id}">Afsluiten</button>
-            <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>Vorige</button>
+            <button class="btn ghost" data-course="${course.id}">${icon("close")} Afsluiten</button>
+            <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>${icon("arrowleft")} Vorige</button>
           </div>
           <div class="ebb-steps">
             <div class="ebb-dots">${Array.from({ length: steps }, (_, i) => `<button class="ebb-dot ${i+1<step?"done":""} ${i+1===step?"active":""}" data-step="${i+1}" aria-label="Stap ${i+1}"></button>`).join("")}</div>
@@ -1384,8 +1384,8 @@ function lessonView() {
         </div>
         <footer class="eqi-bottombar">
           <div class="ebb-side">
-            <button class="btn ghost" data-course="${course.id}">Afsluiten</button>
-            <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>Vorige</button>
+            <button class="btn ghost" data-course="${course.id}">${icon("close")} Afsluiten</button>
+            <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>${icon("arrowleft")} Vorige</button>
           </div>
           <div class="ebb-steps">
             <div class="ebb-dots">${Array.from({ length: steps }, (_, i) => `<button class="ebb-dot ${i+1<step?"done":""} ${i+1===step?"active":""}" data-step="${i+1}" aria-label="Stap ${i+1}"></button>`).join("")}</div>
@@ -1443,8 +1443,8 @@ function lessonView() {
         </div>
         <footer class="eqi-bottombar">
           <div class="ebb-side">
-            <button class="btn ghost" data-course="${course.id}">Afsluiten</button>
-            <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>Vorige</button>
+            <button class="btn ghost" data-course="${course.id}">${icon("close")} Afsluiten</button>
+            <button class="btn ghost" data-prev-step ${step===1?"disabled":""}>${icon("arrowleft")} Vorige</button>
           </div>
           <div class="ebb-steps">
             <div class="ebb-dots">${Array.from({ length: steps }, (_, i) => `<button class="ebb-dot ${i+1<step?"done":""} ${i+1===step?"active":""}" data-step="${i+1}" aria-label="Stap ${i+1}"></button>`).join("")}</div>
