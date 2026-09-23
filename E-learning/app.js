@@ -2319,11 +2319,19 @@ function factcardDetailView(idx) {
   const backBtn = fromLesson
     ? `<button class="breadcrumb" data-back>${icon("arrowleft")} Terug naar les: ${fromLesson.title}</button>`
     : `<button class="breadcrumb" data-fact-filter="${cId}">${icon("arrowleft")} Terug naar factcards</button>`;
+  // De 4 DISC-temperament hero-afbeeldingen (idx 1-4) zijn vierkant (600x600) met een
+  // effen merkkleur: object-fit:cover in de brede fd-hero-balk sneed anders de
+  // "D"/"DOMINANT"-tekst af. object-fit:contain + een passende achtergrondkleur
+  // toont de afbeelding ongecropt, met een naadloze rand.
+  const squareHeroBg = { 1: "#a3171b", 2: "#b59812", 3: "#607d2f", 4: "#1f437b" };
+  const heroBg = squareHeroBg[idx];
+  const heroStyle = heroBg ? ` style="background:${heroBg}"` : "";
+  const heroImgStyle = heroBg ? ` style="object-fit:contain"` : "";
   return shell(`
     <main class="main fd-main">
       ${backBtn}
       <article class="fd-card">
-        <div class="fd-hero"><img src="${hero}" alt="${titleTxt}"/></div>
+        <div class="fd-hero"${heroStyle}><img src="${hero}" alt="${titleTxt}"${heroImgStyle}/></div>
         <div class="fd-head">
           <span class="fd-badge">${icon("filecards")}</span>
           <div><span class="tag">${badgeTag}</span><h1>${titleTxt}</h1><p class="fd-intro">${intro}</p></div>
