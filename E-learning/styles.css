@@ -523,6 +523,10 @@ img.course-img {
 }
 .cd-factcard-pill-text strong { font-size: 17px; color: #fff; font-weight: 700; }
 .cd-factcard-pill-text span { font-size: 13px; color: rgba(255,255,255,.8); }
+.cd-factcard-pill-locked { background: #5b6b80; }
+.cd-factcard-pill-locked .cd-factcard-pill-text strong { display:flex; align-items:center; gap:8px; }
+.cd-factcard-pill-locked .cd-factcard-pill-text strong .icon { width:16px; height:16px; }
+.cd-factcard-pill-locked .cd-factcard-btn { background:#fff; color:#33415c; }
 .cd-factcard-btn {
   background: var(--blue);
   color: #fff;
@@ -737,6 +741,14 @@ img.course-img {
 /* ===== Factcard grid redesign ===== */
 .fc-section { margin-bottom:32px; }
 .fc-section-head { text-align:center; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 16px; }
+.fc-locked { display:flex; align-items:center; gap:18px; background:#f5f7fb; border:1px solid #e3e9f2; border-radius:16px; padding:22px 26px; max-width:720px; margin:0 auto; }
+.fc-locked-icon { flex:none; display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; background:#e3e9f2; color:#5b6b80; }
+.fc-locked-icon .icon { width:20px; height:20px; }
+.fc-locked-text { flex:1; display:flex; flex-direction:column; gap:4px; }
+.fc-locked-text strong { font-size:15px; color:#14213d; }
+.fc-locked-text p { margin:0; font-size:13.5px; color:#5b6b80; line-height:1.5; }
+.fc-locked .btn { flex:none; }
+@media (max-width: 640px) { .fc-locked { flex-direction:column; align-items:flex-start; text-align:left; } }
 .fc-tag { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:var(--muted); margin-bottom:6px; }
 .fc-dot { width:8px; height:8px; border-radius:50%; flex:0 0 auto; background:#9ca3af; }
 .fc-dot-theorie,.fc-dot-team { background:#6b7280; }
