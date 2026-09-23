@@ -819,12 +819,12 @@ img.course-img {
 .eqi-main .lesson-body { padding:8px 12px; gap:8px; }
 .eqi-main .lesson-footer { padding:8px 20px; }
 .eqi-main .eqi-frame-wrap { border-radius:12px; }
-.eqi-main .eqi-frame-wrap iframe { height:calc(100vh - 300px); min-height:380px; }
+.eqi-main .eqi-frame-wrap iframe { height:min(720px, calc(100vh - 300px)); min-height:380px; }
 .eqi-main .eqi-intro-grid { align-items:start; }
-.eqi-main .eqi-intro-img { max-height:calc(100vh - 330px); width:auto; max-width:100%; margin:0 auto; display:block; }
+.eqi-main .eqi-intro-img { max-height:min(720px, calc(100vh - 330px)); width:auto; max-width:100%; margin:0 auto; display:block; }
 
-.eqi-main .eqi-intro-aside { max-height:calc(100vh - 300px); overflow:auto; }
-.eqi-main .eqi-intro-img-wrap iframe { height:calc(100vh - 300px); min-height:380px; }
+.eqi-main .eqi-intro-aside { max-height:min(720px, calc(100vh - 300px)); overflow:auto; }
+.eqi-main .eqi-intro-img-wrap iframe { height:min(720px, calc(100vh - 300px)); min-height:380px; }
 
 /* Vaste onderbalk in de EQ-i les */
 .eqi-shell { grid-template-columns: 1fr; }
