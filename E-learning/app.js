@@ -2319,19 +2319,21 @@ function factcardDetailView(idx) {
   const backBtn = fromLesson
     ? `<button class="breadcrumb" data-back>${icon("arrowleft")} Terug naar les: ${fromLesson.title}</button>`
     : `<button class="breadcrumb" data-fact-filter="${cId}">${icon("arrowleft")} Terug naar factcards</button>`;
-  // De 4 DISC-temperament hero-afbeeldingen (idx 1-4) zijn vierkant (600x600) met een
-  // effen merkkleur: object-fit:cover in de brede fd-hero-balk sneed anders de
-  // "D"/"DOMINANT"-tekst af. object-fit:contain + een passende achtergrondkleur
-  // toont de afbeelding ongecropt, met een naadloze rand.
-  const squareHeroBg = { 1: "#a3171b", 2: "#b59812", 3: "#607d2f", 4: "#1f437b" };
-  const heroBg = squareHeroBg[idx];
-  const heroStyle = heroBg ? ` style="background:${heroBg}"` : "";
-  const heroImgStyle = heroBg ? ` style="object-fit:contain"` : "";
+  // De 4 DISC-temperament hero-afbeeldingen (idx 1-4) zijn vierkant (600x600); de
+  // letter + het woord (bv. "D" / "DOMINANT") staan daarin verticaal gecentreerd in
+  // een band van ~y195-390 (dus het middelste ~49% van de hoogte). De brede fd-hero
+  // -balk (standaard hoogte:260px, ~4.4:1) toonde met object-fit:cover maar een
+  // veel smallere reep uit het midden, waardoor de tekst werd afgesneden. Door voor
+  // deze 4 kaarten een vaste aspect-ratio van 2:1 te gebruiken i.p.v. een vaste
+  // hoogte, toont cover steeds exact de gecentreerde band met de volledige tekst
+  // erin (met ruime marge), ingezoomd en zonder cropping — op elke schermbreedte.
+  const squareHero = new Set([1, 2, 3, 4]);
+  const heroStyle = squareHero.has(idx) ? ` style="aspect-ratio:2/1;height:auto"` : "";
   return shell(`
     <main class="main fd-main">
       ${backBtn}
       <article class="fd-card">
-        <div class="fd-hero"${heroStyle}><img src="${hero}" alt="${titleTxt}"${heroImgStyle}/></div>
+        <div class="fd-hero"${heroStyle}><img src="${hero}" alt="${titleTxt}"/></div>
         <div class="fd-head">
           <span class="fd-badge">${icon("filecards")}</span>
           <div><span class="tag">${badgeTag}</span><h1>${titleTxt}</h1><p class="fd-intro">${intro}</p></div>
