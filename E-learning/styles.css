@@ -861,6 +861,19 @@ img.course-img {
 
 /* Les 1-1: De basis van menselijk gedrag */
 .gb-card { background: #fff; border: 1px solid #e4e9f1; border-radius: 14px; padding: 26px 28px; box-shadow: 0 8px 22px rgba(43,61,91,.06); }
+.eqi-card-list { margin:0 0 16px; padding-left:20px; color:#33415c; line-height:1.6; }
+.eqi-card-list li { margin-bottom:6px; }
+.eqi-card-block { border-radius:12px; padding:14px 18px; margin:16px 0; line-height:1.6; }
+.eqi-card-block strong { display:block; font-size:12.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; margin-bottom:8px; }
+.eqi-card-block ul { margin:8px 0 0; padding-left:20px; }
+.eqi-card-block li { margin-bottom:4px; }
+.eqi-card-example { background:#f0f5ff; border-left:5px solid #2f5ed6; color:#1f2f52; }
+.eqi-card-example strong { color:#2f5ed6; }
+.eqi-card-exercise { background:#f2faf3; border-left:5px solid #2f9e52; color:#1c3a26; }
+.eqi-card-exercise strong { color:#2f9e52; }
+.eqi-card-keymsg { background:#fff8e6; border-left:5px solid #c99400; }
+.eqi-card-transition { display:flex; align-items:center; gap:8px; margin:18px 0 0; padding-top:14px; border-top:1px solid #e4e9f1; font-size:.92rem; font-style:italic; color:#5b6b80; }
+.eqi-card-transition .icon { width:14px; height:14px; flex:none; color:#8c9bb3; }
 .gb-flex { display: flex; gap: 24px; align-items: flex-start; }
 .gb-flex .gb-text { flex: 1.4; min-width: 0; }
 .gb-flex .gb-img { flex: 1; }
