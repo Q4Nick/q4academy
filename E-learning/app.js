@@ -1233,7 +1233,7 @@ function courseView() {
 
   return shell(`
     <main class="main cd-main">
-      <button class="breadcrumb" data-route="dashboard">← Terug naar dashboard</button>
+      <button class="breadcrumb" data-route="dashboard">${icon("arrowleft")} Terug naar dashboard</button>
 
       <div class="cd-hero">
         <div class="cd-hero-text">
@@ -1328,7 +1328,7 @@ function lessonView() {
         <div class="lesson-shell eqi-shell">
           <section class="lesson-content">
             <header class="lesson-header">
-              <button class="breadcrumb" data-course="${course.id}">Terug naar cursus</button>
+              <button class="breadcrumb" data-course="${course.id}">${icon("arrowleft")} Terug naar cursus</button>
               <span class="module-badge module-badge-interesses">Interesses</span>
               <h1>${meta.t}</h1>
               <p>${meta.p}</p>
@@ -1371,7 +1371,7 @@ function lessonView() {
         <div class="lesson-shell eqi-shell">
           <section class="lesson-content">
             <header class="lesson-header">
-              <button class="breadcrumb" data-course="${course.id}">Terug naar cursus</button>
+              <button class="breadcrumb" data-course="${course.id}">${icon("arrowleft")} Terug naar cursus</button>
               <span class="module-badge module-badge-waarden">Waarden</span>
               <h1>${meta.t}</h1>
               <p>${meta.p}</p>
@@ -1415,7 +1415,7 @@ function lessonView() {
         <div class="lesson-shell eqi-shell">
           <section class="lesson-content">
             <header class="lesson-header">
-              <button class="breadcrumb" data-course="${course.id}">Terug naar cursus</button>
+              <button class="breadcrumb" data-course="${course.id}">${icon("arrowleft")} Terug naar cursus</button>
               <span class="module-badge module-badge-eqi">EQ-i 2.0</span>
               <h1>${meta.t}</h1>
               <p>${meta.p}</p>
@@ -1463,7 +1463,7 @@ function lessonView() {
       <div class="lesson-shell lesson-shell-flat">
         <section class="lesson-content">
           <header class="lesson-header">
-            <button class="breadcrumb" data-course="${course.id}">Terug naar cursus</button>
+            <button class="breadcrumb" data-course="${course.id}">${icon("arrowleft")} Terug naar cursus</button>
             <h1>${lesson.title}</h1>
             <p>${lesson.intro}</p>
           </header>
@@ -2268,7 +2268,7 @@ function trainerView() {
   const course = courseById();
   return shell(`
     <main class="main">
-      <button class="breadcrumb" data-course="${course.id}">Terug naar ${course.title}</button>
+      <button class="breadcrumb" data-course="${course.id}">${icon("arrowleft")} Terug naar ${course.title}</button>
       <section class="trainer-panel">
         <span class="tag">Timed Quiz</span>
         <div class="page-head">
@@ -2353,8 +2353,8 @@ function factcardsView(filterCourse) {
     { id: 5, label: "HET Q4 INTERESSESMODEL" },
   ].filter(g => !filterCourse || g.id === Number(filterCourse));
   const breadcrumb = filterCourse
-    ? `<button class="breadcrumb" data-course="${filterCourse}">← Terug naar cursus</button>`
-    : `<button class="breadcrumb" data-back>← Terug naar vorige pagina</button>`;
+    ? `<button class="breadcrumb" data-course="${filterCourse}">${icon("arrowleft")} Terug naar cursus</button>`
+    : `<button class="breadcrumb" data-back>${icon("arrowleft")} Terug naar vorige pagina</button>`;
   const sections = courseGroups.map(({ id, label }) => {
     const list = factcards.map((c, gi) => ({ c, gi })).filter(({ c }) => c[3] === id);
     return `
@@ -2486,7 +2486,7 @@ function profielView() {
   const pwMsg = state.pwMsg;
   return shell(`
     <main class="main profile-main">
-      <button class="breadcrumb" data-route="dashboard">← Terug naar dashboard</button>
+      <button class="breadcrumb" data-route="dashboard">${icon("arrowleft")} Terug naar dashboard</button>
       <div class="page-head"><div><h1>Mijn profiel</h1><p>Bekijk en wijzig je accountgegevens.</p></div></div>
 
       <div class="profile-grid">
