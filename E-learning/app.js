@@ -2315,9 +2315,13 @@ function factcardDetailView(idx) {
   const titleTxt = d ? d.title : title;
   const intro = d ? d.intro : text;
   const body = sections.map(fcBlock).join("");
+  const fromLesson = state.prevRoute === "lesson" && lessonById(state.activeLesson);
+  const backBtn = fromLesson
+    ? `<button class="breadcrumb" data-back>${icon("arrow")} Terug naar les: ${fromLesson.title}</button>`
+    : `<button class="breadcrumb" data-fact-filter="${cId}">${icon("arrow")} Terug naar factcards</button>`;
   return shell(`
     <main class="main fd-main">
-      <button class="breadcrumb" data-fact-filter="${cId}">${icon("arrow")} Terug naar factcards</button>
+      ${backBtn}
       <article class="fd-card">
         <div class="fd-hero"><img src="${hero}" alt="${titleTxt}"/></div>
         <div class="fd-head">
