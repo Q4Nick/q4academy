@@ -801,8 +801,11 @@ img.course-img {
 
 /* EQ-i les stap 1: statisch wiel + uitlegkolom (75/25) */
 .eqi-intro-grid { display:grid; grid-template-columns:3fr 1fr; gap:20px; align-items:start; background:#fff; border:1px solid #e3e9f2; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(36,59,93,.06); }
+.eqi-intro-img-col { display:flex; flex-direction:column; gap:8px; min-width:0; }
 .eqi-intro-img-wrap { display:flex; justify-content:center; }
 .eqi-intro-img { width:100%; max-width:560px; height:auto; }
+.eqi-frame-wrap-outer { display:flex; flex-direction:column; gap:8px; }
+.eqi-mhs-note { margin:0; font-size:.82rem; padding:8px 12px; }
 .eqi-intro-aside { background:#f5f8ff; border-left:5px solid #173b8f; border-radius:14px; padding:18px; }
 .eqi-intro-aside h3 { margin:0 0 8px; font-size:17px; }
 .eqi-intro-aside p { margin:0 0 10px; color:#33415c; line-height:1.55; font-size:14.5px; }
