@@ -1990,8 +1990,9 @@ function lessonView() {
             ${Array.from({ length: lesson.steps }, (_, i) => `<button class="step-dot ${i+1<step?"done":""} ${i+1===step?"active":""}" data-step="${i+1}" aria-label="Stap ${i+1}"></button>`).join("")}
           </div>
           <div class="step-dots-caption">Stap ${step} van ${lesson.steps} &middot; Quiz: ${lesson.quiz} correct</div>
+          ${lsStepGated() ? `<div class="step-dots-hint">Controleer eerst je antwoord om verder te gaan.</div>` : ""}
         </div>
-        <button class="btn" data-next-step>${step===lesson.steps?"Les afronden":"Volgende"} ${icon("arrow")}</button>
+        <button class="btn" data-next-step ${lsStepGated() ? "disabled" : ""}>${step===lesson.steps?"Les afronden":"Volgende"} ${icon("arrow")}</button>
       </footer>
     </main>`, "dashboard");
 }
@@ -2031,7 +2032,7 @@ const gbMatch = {
 };
 
 function gbState() {
-  if (!state.gb) state.gb = { checks: {}, result: null, tf: "", tfResult: null, mc: "", mcResult: null, brain: {}, order: [1, 2, 0], matchResult: null };
+  if (!state.gb) state.gb = { checks: {}, result: null, tf: "", tfResult: null, mc: "", mcResult: null, brain: {}, order: [1, 2, 0], matchResult: null, requiresCheck: false, checked: false };
   return state.gb;
 }
 
@@ -2104,6 +2105,8 @@ function gedragContent(step) {
   ], gbZelfkennis);
   if (step === 13) {
     const done = gb.result !== null;
+    gb.requiresCheck = true;
+    gb.checked = done;
     const sel = gb.checks;
     return `<div class="gb-card">
       <h3>${gbQuiz13.vraag}</h3>
@@ -2121,6 +2124,8 @@ function gedragContent(step) {
   }
   if (step === 14) {
     const done = gb.tfResult !== null;
+    gb.requiresCheck = true;
+    gb.checked = done;
     return `<div class="gb-card">
       <h3>\u201cHoe ouder een gewoonte, hoe meer tijd en moeite het kost voor deze vervangen is door een nieuwe.\u201d</h3>
       <p class="gb-sub">${icon("clock")} Selecteer een antwoord</p>
@@ -2136,6 +2141,8 @@ function gedragContent(step) {
   }
   if (step === 15) {
     const done = gb.matchResult !== null;
+    gb.requiresCheck = true;
+    gb.checked = done;
     return `<div class="gb-card">
       <p class="gb-sub">Gebruik de pijltjes om de rechterkolom te herschikken zodat elk item naast het juiste antwoord staat</p>
       <h3>Welke deel van het brein is verantwoordelijk voor onderstaande acties?</h3>
@@ -2158,6 +2165,8 @@ function gedragContent(step) {
   }
   if (step === 16) {
     const done = gb.mcResult !== null;
+    gb.requiresCheck = true;
+    gb.checked = done;
     const opties = ["Het persoonlijke acceptatieniveau", "De rangorde van behoeften", "Prestatieniveaus", "De sociale ladder"];
     return `<div class="gb-card">
       <h3>Wat beschrijft de piramide van Maslow?</h3>
@@ -2177,8 +2186,17 @@ function gedragContent(step) {
 
 // ---- Generic lesson-content engine (used by lessons 1-2, 1-3, 2-1, 2-2, 2-3) ----
 function lsState() {
-  if (!state.ls) state.ls = { mc: "", mcResult: null, tf: "", tfResult: null, checks: {}, checkResult: null, cats: {}, catResult: null, scaleH: null, scaleV: null, quad: {} };
+  if (!state.ls) state.ls = { mc: "", mcResult: null, tf: "", tfResult: null, checks: {}, checkResult: null, cats: {}, catResult: null, scaleH: null, scaleV: null, quad: {}, requiresCheck: false, checked: false };
   return state.ls;
+}
+
+// Een stap is pas "voltooid" als de opdracht is gecontroleerd (goed of fout, maakt niet uit).
+// Alleen de admin-testaccount mag lessen afronden zonder de opdrachten te hebben voltooid.
+function lsStepGated() {
+  if (currentUser.role === "Admin") return false;
+  const ls = state.ls;
+  const gb = state.gb;
+  return !!((ls && ls.requiresCheck && !ls.checked) || (gb && gb.requiresCheck && !gb.checked));
 }
 
 function lsTextCard(title, paragraphs, img, caption) {
@@ -2197,6 +2215,8 @@ function lsReflect(title, paragraphs) {
 function lsMC(question, options, correctIndex, sub) {
   const ls = lsState();
   const done = ls.mcResult !== null;
+  ls.requiresCheck = true;
+  ls.checked = done;
   return `<div class="gb-card">
     <h3>${question}</h3>
     <p class="gb-sub">${sub || "Selecteer een antwoord"}</p>
@@ -2215,6 +2235,8 @@ function lsMC(question, options, correctIndex, sub) {
 function lsTF(statement, correct) {
   const ls = lsState();
   const done = ls.tfResult !== null;
+  ls.requiresCheck = true;
+  ls.checked = done;
   const correctLabel = correct ? "Juist" : "Onjuist";
   return `<div class="gb-card">
     <h3>${statement}</h3>
@@ -2234,6 +2256,8 @@ function lsTF(statement, correct) {
 function lsCategorize(question, items, cats) {
   const ls = lsState();
   const done = ls.catResult !== null;
+  ls.requiresCheck = true;
+  ls.checked = done;
   const verifyAttr = items.map((it, i) => `${i}:${it.cat}`).join("|");
   return `<div class="gb-card">
     <h3>${question}</h3>
@@ -2257,6 +2281,8 @@ function lsCategorize(question, items, cats) {
 function lsCheck(question, options, correctIndices, sub) {
   const ls = lsState();
   const done = ls.checkResult !== null;
+  ls.requiresCheck = true;
+  ls.checked = done;
   return `<div class="gb-card">
     <h3>${question}</h3>
     <p class="gb-sub">${sub || "Selecteer alle juiste antwoorden"}</p>
@@ -3163,7 +3189,7 @@ document.addEventListener("click", (e) => {
   if (t.dataset.factDetail) navigate("factcard", { activeFact:Number(t.dataset.factDetail) });
   if (t.dataset.step) navigate("lesson", { step:Number(t.dataset.step), selectedAnswer:"", gb:null, ls:null });
   if (t.hasAttribute("data-prev-step")) navigate("lesson", { step:Math.max(1,state.step-1), selectedAnswer:"", gb:null, ls:null });
-  if (t.hasAttribute("data-next-step")) {
+  if (t.hasAttribute("data-next-step") && !lsStepGated()) {
     const l = lessonById();
     if (state.step >= l.steps) {
       const c = courses.find(c => c.id === state.activeCourse);
